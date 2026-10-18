@@ -6,7 +6,9 @@ import {
   X,
   MessageCircle,
   HelpCircle,
-  Ruler
+  Ruler,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { BRAND_CONFIG } from "../config/brandConfig.js";
 
@@ -20,6 +22,82 @@ export const Navbar = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Announcement Slider State
+  const announcements = BRAND_CONFIG.announcements || [
+    {
+      id: "dream-nails",
+      text: "Your dream nails, delivered 💌",
+      sub: "Discover your signature nail vibe",
+      action: "shop"
+    },
+    {
+      id: "free-shipping",
+      text: "Free Pan-India Shipping over ₹999 📦",
+      sub: "Express 3–5 day doorstep delivery",
+      action: "shop"
+    },
+    {
+      id: "salon-finish",
+      text: "Salon Finish in 10 Mins 💅🏻",
+      sub: "Reusable up to 5x • Gentle on natural nails",
+      action: "about"
+    },
+    {
+      id: "nail-quiz",
+      text: "Find Your Nail Aesthetic ✨",
+      sub: "Take our 60-second Nail Vibe Quiz",
+      action: "quiz"
+    }
+  ];
+
+  const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
+  const [announcementFade, setAnnouncementFade] = useState(true);
+  const [isAnnouncementPaused, setIsAnnouncementPaused] = useState(false);
+
+  useEffect(() => {
+    if (isAnnouncementPaused) return;
+    const timer = setInterval(() => {
+      setAnnouncementFade(false);
+      setTimeout(() => {
+        setCurrentAnnouncementIndex((prev) => (prev + 1) % announcements.length);
+        setAnnouncementFade(true);
+      }, 220);
+    }, 3800);
+    return () => clearInterval(timer);
+  }, [isAnnouncementPaused, announcements.length]);
+
+  const handlePrevAnnouncement = (e) => {
+    e.stopPropagation();
+    setAnnouncementFade(false);
+    setTimeout(() => {
+      setCurrentAnnouncementIndex(
+        (prev) => (prev - 1 + announcements.length) % announcements.length
+      );
+      setAnnouncementFade(true);
+    }, 150);
+  };
+
+  const handleNextAnnouncement = (e) => {
+    e.stopPropagation();
+    setAnnouncementFade(false);
+    setTimeout(() => {
+      setCurrentAnnouncementIndex((prev) => (prev + 1) % announcements.length);
+      setAnnouncementFade(true);
+    }, 150);
+  };
+
+  const handleAnnouncementClick = (action) => {
+    if (action === "quiz") {
+      if (onOpenQuiz) onOpenQuiz();
+    } else if (action === "sizing") {
+      if (onOpenSizing) onOpenSizing();
+    } else if (action === "shop") {
+      handleNavClick("shop");
+    } else if (action === "about") {
+      handleNavClick("about");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,7 +117,7 @@ export const Navbar = ({
 
   const handleNavClick = (id) => {
     if (id === "sizing") {
-      onOpenSizing && onOpenSizing();
+      if (onOpenSizing) onOpenSizing();
     } else {
       setActiveTab(id);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -47,13 +125,68 @@ export const Navbar = ({
     setMobileMenuOpen(false);
   };
 
+  const currentAnnouncement = announcements[currentAnnouncementIndex] || announcements[0];
+
   return (
     <header className="sticky top-0 z-50 w-full transition-all duration-300">
-      {/* 1. Announcement Bar */}
-      <div className="bg-[#64263C] text-[#FFF9F5] text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 border-b border-[#4E1C2E] whitespace-nowrap">
-        <Sparkles className="w-3.5 h-3.5 text-[#D6B477] animate-sparkle shrink-0" />
-        <span className="whitespace-nowrap">{BRAND_CONFIG.announcementText}</span>
-        <span className="hidden md:inline-block text-[#D6B477] whitespace-nowrap">• Free Pan-India Shipping over ₹999</span>
+      {/* 1. Auto-Rotating Announcement Bar (Optimized for Mobile & Desktop) */}
+      <div
+        className="bg-[#64263C] text-[#FFF9F5] py-2 px-2 sm:px-4 border-b border-[#4E1C2E] select-none transition-colors"
+        onMouseEnter={() => setIsAnnouncementPaused(true)}
+        onMouseLeave={() => setIsAnnouncementPaused(false)}
+        onTouchStart={() => setIsAnnouncementPaused(true)}
+        onTouchEnd={() => setIsAnnouncementPaused(false)}
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-1 sm:gap-2">
+          {/* Previous Arrow Button */}
+          <button
+            type="button"
+            onClick={handlePrevAnnouncement}
+            className="p-1 text-[#FFF9F5]/70 hover:text-[#D6B477] hover:bg-white/10 active:scale-90 rounded-full transition-all shrink-0 focus:outline-none"
+            aria-label="Previous announcement"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Announcement Content (Clickable) */}
+          <div
+            onClick={() => handleAnnouncementClick(currentAnnouncement.action)}
+            className={`flex-1 min-w-0 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 text-center transition-all duration-300 ease-in-out ${
+              announcementFade
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 -translate-y-1"
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#D6B477] animate-sparkle shrink-0" />
+            
+            {/* Primary message: Fits on every phone without clipping or horizontal overflow */}
+            <span className="font-semibold text-[11px] sm:text-xs text-[#FFF9F5] tracking-wide truncate">
+              {currentAnnouncement.text}
+            </span>
+
+            {/* Desktop secondary detail */}
+            {currentAnnouncement.sub && (
+              <span className="hidden md:inline-block text-[#D6B477] text-xs font-normal">
+                • {currentAnnouncement.sub}
+              </span>
+            )}
+
+            {/* Interactive hint on desktop */}
+            <span className="hidden lg:inline-block text-[10px] text-[#D6B477]/80 hover:text-[#D6B477] ml-1 underline decoration-dotted">
+              view →
+            </span>
+          </div>
+
+          {/* Next Arrow Button */}
+          <button
+            type="button"
+            onClick={handleNextAnnouncement}
+            className="p-1 text-[#FFF9F5]/70 hover:text-[#D6B477] hover:bg-white/10 active:scale-90 rounded-full transition-all shrink-0 focus:outline-none"
+            aria-label="Next announcement"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* 2. Main Navigation Bar */}
@@ -159,7 +292,7 @@ export const Navbar = ({
             <div className="pt-4 border-t border-pink-200 flex flex-col gap-3">
               <button
                 onClick={() => {
-                  onOpenQuiz && onOpenQuiz();
+                  if (onOpenQuiz) onOpenQuiz();
                   setMobileMenuOpen(false);
                 }}
                 className="btn-primary w-full py-3 text-sm justify-center"
@@ -170,7 +303,7 @@ export const Navbar = ({
 
               <button
                 onClick={() => {
-                  onOpenSizing && onOpenSizing();
+                  if (onOpenSizing) onOpenSizing();
                   setMobileMenuOpen(false);
                 }}
                 className="btn-secondary w-full py-2.5 text-xs justify-center"

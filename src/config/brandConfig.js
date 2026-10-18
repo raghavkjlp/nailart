@@ -12,6 +12,32 @@ export const BRAND_CONFIG = {
   // Announcement ticker text
   announcementText: "Your dream nails, delivered 💌 | Discover your signature nail vibe.",
   announcementSub: "Handcrafted Luxury • Reusable up to 5x • Salon Finish in 10 Mins 💅🏻",
+  announcements: [
+    {
+      id: "dream-nails",
+      text: "Your dream nails, delivered 💌",
+      sub: "Discover your signature nail vibe",
+      action: "shop"
+    },
+    {
+      id: "free-shipping",
+      text: "Free Pan-India Shipping over ₹999 📦",
+      sub: "Express 3–5 day doorstep delivery",
+      action: "shop"
+    },
+    {
+      id: "salon-finish",
+      text: "Salon Finish in 10 Mins 💅🏻",
+      sub: "Reusable up to 5x • Gentle on natural nails",
+      action: "about"
+    },
+    {
+      id: "nail-quiz",
+      text: "Find Your Nail Aesthetic ✨",
+      sub: "Take our 60-second Nail Vibe Quiz",
+      action: "quiz"
+    }
+  ],
   
   // WhatsApp Configuration (Replace with actual WhatsApp business number when live)
   // Format: country code + 10 digit number without '+' or '-'
