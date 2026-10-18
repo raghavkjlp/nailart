@@ -32,17 +32,13 @@ export const Navbar = ({
   const navItems = [
     { id: "home", label: "Home" },
     { id: "shop", label: "Shop Nail Sets" },
-    { id: "quiz", label: "Find My Nail Vibe ✨", isSpecial: true },
-    { id: "custom", label: "Custom Orders" },
     { id: "sizing", label: "Sizing Guide" },
     { id: "about", label: "About Us" },
     { id: "contact", label: "Contact" }
   ];
 
   const handleNavClick = (id) => {
-    if (id === "quiz") {
-      onOpenQuiz && onOpenQuiz();
-    } else if (id === "sizing") {
+    if (id === "sizing") {
       onOpenSizing && onOpenSizing();
     } else {
       setActiveTab(id);
@@ -54,10 +50,10 @@ export const Navbar = ({
   return (
     <header className="sticky top-0 z-50 w-full transition-all duration-300">
       {/* 1. Announcement Bar */}
-      <div className="bg-[#64263C] text-[#FFF9F5] text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 border-b border-[#4E1C2E]">
-        <Sparkles className="w-3.5 h-3.5 text-[#D6B477] animate-sparkle" />
-        <span>{BRAND_CONFIG.announcementText}</span>
-        <span className="hidden md:inline-block text-[#D6B477]">• Free Pan-India Shipping over ₹999</span>
+      <div className="bg-[#64263C] text-[#FFF9F5] text-xs py-2 px-4 text-center font-medium tracking-wide flex items-center justify-center gap-2 border-b border-[#4E1C2E] whitespace-nowrap">
+        <Sparkles className="w-3.5 h-3.5 text-[#D6B477] animate-sparkle shrink-0" />
+        <span className="whitespace-nowrap">{BRAND_CONFIG.announcementText}</span>
+        <span className="hidden md:inline-block text-[#D6B477] whitespace-nowrap">• Free Pan-India Shipping over ₹999</span>
       </div>
 
       {/* 2. Main Navigation Bar */}
@@ -68,11 +64,11 @@ export const Navbar = ({
             : "bg-[#FFF9F5]/80 backdrop-blur-sm py-4 border-b border-pink-100"
         }`}
       >
-        <div className="container-custom flex items-center justify-between">
+        <div className="container-custom flex items-center justify-between gap-4">
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-[#64263C] hover:bg-pink-100/50 rounded-xl transition-colors"
+            className="lg:hidden p-2 text-[#64263C] hover:bg-pink-100/50 rounded-xl transition-colors shrink-0"
             aria-label="Toggle menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -81,35 +77,33 @@ export const Navbar = ({
           {/* Brand Logo Text Treatment */}
           <div
             onClick={() => handleNavClick("home")}
-            className="cursor-pointer flex flex-col items-center lg:items-start select-none group"
+            className="cursor-pointer flex flex-col items-center lg:items-start select-none group shrink-0"
           >
-            <div className="flex items-center gap-1.5">
-              <span className="font-serif text-2xl sm:text-3xl font-extrabold tracking-wider text-[#64263C] group-hover:text-[#4E1C2E] transition-colors">
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-serif text-2xl sm:text-3xl font-extrabold tracking-wider text-[#64263C] group-hover:text-[#4E1C2E] transition-colors whitespace-nowrap">
                 GAMES OF GLOSS
               </span>
-              <span className="text-xl">💅🏻</span>
+              <span className="text-xl shrink-0">💅🏻</span>
             </div>
-            <span className="text-[10px] tracking-[0.25em] font-sans font-bold uppercase text-[#D6B477] -mt-1 hidden sm:block">
+            <span className="text-[10px] tracking-[0.25em] font-sans font-bold uppercase text-[#D6B477] -mt-1 hidden sm:block whitespace-nowrap">
               Luxury Press-On Atelier
             </span>
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex items-center gap-7">
+          <div className="hidden lg:flex items-center gap-6 xl:gap-8 shrink-0">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`text-sm font-semibold tracking-wide transition-all duration-200 relative py-1 ${
-                  item.isSpecial
-                    ? "text-[#64263C] font-bold px-3 py-1 bg-pink-100/80 rounded-full border border-pink-200 hover:bg-pink-200 hover:scale-105"
-                    : activeTab === item.id
+                className={`text-sm font-semibold tracking-wide transition-all duration-200 relative py-1 whitespace-nowrap shrink-0 ${
+                  activeTab === item.id
                     ? "text-[#64263C]"
                     : "text-[#5A5255] hover:text-[#64263C]"
                 }`}
               >
                 {item.label}
-                {!item.isSpecial && activeTab === item.id && (
+                {activeTab === item.id && (
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-[#64263C] rounded-full" />
                 )}
               </button>
@@ -117,20 +111,20 @@ export const Navbar = ({
           </div>
 
           {/* Action CTAs: Find My Vibe + Cart */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {/* Prominent Find My Vibe button */}
             <button
               onClick={() => onOpenQuiz && onOpenQuiz()}
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full bg-gradient-to-r from-[#F3B6CB] via-[#D6B477] to-[#F3B6CB] text-[#64263C] shadow-sm hover:shadow-md hover:scale-105 transition-all border border-pink-200"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full bg-gradient-to-r from-[#F3B6CB] via-[#D6B477] to-[#F3B6CB] text-[#64263C] shadow-sm hover:shadow-md hover:scale-105 transition-all border border-pink-200 whitespace-nowrap shrink-0"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#64263C]" />
-              <span>Find My Vibe</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#64263C] shrink-0" />
+              <span className="whitespace-nowrap">Find My Vibe</span>
             </button>
 
             {/* Shopping Bag Drawer Button */}
             <button
               onClick={onOpenCart}
-              className="relative p-2.5 rounded-full bg-white/80 hover:bg-pink-100 text-[#64263C] border border-pink-200 transition-all shadow-sm"
+              className="relative p-2.5 rounded-full bg-white/80 hover:bg-pink-100 text-[#64263C] border border-pink-200 transition-all shadow-sm shrink-0"
               aria-label="Shopping Bag"
             >
               <ShoppingBag className="w-5 h-5" />
