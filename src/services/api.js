@@ -6,8 +6,11 @@
 const TOKEN_KEY = "gog_admin_jwt";
 const ADMIN_KEY = "gog_admin_user";
 
-// Configurable API Base (supports Render deployed backend URL via VITE_API_URL)
-const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+// Configurable API Base (defaults to deployed Render backend)
+const API_BASE = (
+  import.meta.env.VITE_API_URL ||
+  "https://nailart-z8gc.onrender.com"
+).replace(/\/$/, "");
 
 /**
  * Authentication Helpers

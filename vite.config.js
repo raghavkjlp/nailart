@@ -10,8 +10,9 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true
+        target: 'https://nailart-z8gc.onrender.com',
+        changeOrigin: true,
+        secure: true
       }
     }
   }
