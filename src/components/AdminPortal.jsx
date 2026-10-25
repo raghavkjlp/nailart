@@ -120,6 +120,22 @@ export const AdminPortal = ({
     setTimeout(() => setNotification(null), 4000);
   };
 
+  // Sync DB manual trigger
+  const handleSyncDb = async () => {
+    setIsSyncing(true);
+    try {
+      await syncProductsWithDb();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
+      notify("Synced with MongoDB Atlas! 🍃");
+    } catch {
+      notify("Could not reach MongoDB server, using cached data", "info");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   // Sync with MongoDB on initial load
   useEffect(() => {
     if (isLoggedIn) {
@@ -154,20 +170,6 @@ export const AdminPortal = ({
       onSwitchToShop();
     }
     notify("Logged out from Admin Portal", "info");
-  };
-
-  // Sync DB manual trigger
-  const handleSyncDb = async () => {
-    setIsSyncing(true);
-    try {
-      await syncProductsWithDb();
-      onRefreshProducts && onRefreshProducts();
-      notify("Synced with MongoDB Atlas! 🍃");
-    } catch (err) {
-      notify("Could not reach MongoDB server, using cached data", "info");
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   // Open Form to Add New
@@ -361,12 +363,16 @@ export const AdminPortal = ({
         notify(`Saved "${payload.name}" to MongoDB Atlas! Live on store 💅🏻`);
       }
 
-      onRefreshProducts && onRefreshProducts();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
       setModalOpen(false);
     } catch (err) {
       console.error("Save error:", err);
       notify("Saved to local catalog (MongoDB offline)", "info");
-      onRefreshProducts && onRefreshProducts();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
       setModalOpen(false);
     } finally {
       setIsSavingToDb(false);
@@ -378,9 +384,11 @@ export const AdminPortal = ({
     try {
       await deleteProduct(id);
       setDeleteConfirmId(null);
-      onRefreshProducts && onRefreshProducts();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
       notify("Product deleted from MongoDB Atlas");
-    } catch (err) {
+    } catch {
       notify("Failed to delete product", "error");
     }
   };
@@ -389,9 +397,11 @@ export const AdminPortal = ({
   const handleDuplicate = async (id) => {
     try {
       await duplicateProduct(id);
-      onRefreshProducts && onRefreshProducts();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
       notify("Product duplicated as copy in MongoDB");
-    } catch (err) {
+    } catch {
       notify("Failed to duplicate product", "error");
     }
   };
@@ -401,9 +411,11 @@ export const AdminPortal = ({
     try {
       await clearAllProducts();
       setClearConfirmOpen(false);
-      onRefreshProducts && onRefreshProducts();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
       notify("Catalog cleared. Sample data removed from MongoDB Atlas.", "info");
-    } catch (err) {
+    } catch {
       notify("Failed to clear catalog", "error");
     }
   };
@@ -412,9 +424,11 @@ export const AdminPortal = ({
   const handleRestoreTemplate = async () => {
     try {
       await restoreCoquetteTemplate();
-      onRefreshProducts && onRefreshProducts();
+      if (onRefreshProducts) {
+        onRefreshProducts();
+      }
       notify("Restored Coquette Affair template in MongoDB! 🎀");
-    } catch (err) {
+    } catch {
       notify("Failed to restore template", "error");
     }
   };

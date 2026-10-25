@@ -1,14 +1,12 @@
+import "../config/env.js";
 import express from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { requireAdmin } from "../middleware/auth.js";
 
-dotenv.config();
-
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || "games_of_gloss_secret_atelier_jwt_2026_luxury_atelier";
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin1234";
+const JWT_SECRET = process.env.JWT_SECRET || "";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "";
 
 /**
  * Admin Login Endpoint

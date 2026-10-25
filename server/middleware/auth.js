@@ -1,9 +1,7 @@
+import "../config/env.js";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET || "games_of_gloss_secret_atelier_jwt_2026_luxury_atelier";
+const JWT_SECRET = process.env.JWT_SECRET || "";
 
 export const requireAdmin = (req, res, next) => {
   try {

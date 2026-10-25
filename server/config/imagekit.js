@@ -1,12 +1,24 @@
+import "./env.js";
 import ImageKit from "imagekit";
-import dotenv from "dotenv";
 
-dotenv.config();
+const publicKey = process.env.IMAGEKIT_PUBLIC_KEY || "";
+const privateKey = process.env.IMAGEKIT_PRIVATE_KEY || "";
+const urlEndpoint = process.env.IMAGEKIT_URL_ENDPOINT || "";
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "public_pc4jxypuCtNpQcrWVi+vbNvRL+k=",
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "private_yxebzpypbld1Kv3xq0lF1+DCnO8=",
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || "https://ik.imagekit.io/nrbbmx019"
-});
+let imagekit = null;
+
+if (publicKey && privateKey && urlEndpoint) {
+  try {
+    imagekit = new ImageKit({
+      publicKey,
+      privateKey,
+      urlEndpoint
+    });
+  } catch (err) {
+    console.error("Failed to initialize ImageKit client:", err.message);
+  }
+} else {
+  console.warn("⚠️ ImageKit environment variables not set in .env. Image uploads will require IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, and IMAGEKIT_URL_ENDPOINT.");
+}
 
 export default imagekit;

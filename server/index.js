@@ -1,19 +1,15 @@
+import "./config/env.js";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
 import authRoutes from "./routes/auth.js";
 import productRoutes from "./routes/products.js";
 import uploadRoutes from "./routes/upload.js";
 import Product from "./models/Product.js";
 
-dotenv.config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  "mongodb+srv://gamesofgloss_db_user:UuXlcLpSC5PMIuGO@cluster0.nkdam76.mongodb.net/gamesofgloss?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // Middlewares
 app.use(cors());
@@ -84,6 +80,9 @@ async function seedDefaultIfEmpty() {
 // Connect to MongoDB and start server
 async function startServer() {
   try {
+    if (!MONGODB_URI) {
+      throw new Error("MONGODB_URI is missing. Please define it in your .env or Render Environment Variables.");
+    }
     console.log("Connecting to MongoDB Atlas...");
     await mongoose.connect(MONGODB_URI);
     console.log("MongoDB Atlas connected successfully!");
@@ -91,10 +90,10 @@ async function startServer() {
     await seedDefaultIfEmpty();
 
     app.listen(PORT, () => {
-      console.log(`Games of Gloss Atelier API running on http://localhost:${PORT}`);
+      console.log(`Games of Gloss Atelier API running on port ${PORT}`);
     });
   } catch (err) {
-    console.error("Failed to connect to MongoDB Atlas:", err);
+    console.error("Failed to connect to MongoDB Atlas:", err.message);
     process.exit(1);
   }
 }

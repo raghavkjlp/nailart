@@ -27,6 +27,13 @@ const upload = multer({
  */
 router.post("/", requireAdmin, upload.array("images", 8), async (req, res) => {
   try {
+    if (!imagekit) {
+      return res.status(500).json({
+        success: false,
+        message: "ImageKit credentials are not configured in environment variables / .env."
+      });
+    }
+
     const files = req.files;
     if (!files || files.length === 0) {
       return res.status(400).json({
@@ -75,6 +82,13 @@ router.post("/", requireAdmin, upload.array("images", 8), async (req, res) => {
  */
 router.post("/base64", requireAdmin, async (req, res) => {
   try {
+    if (!imagekit) {
+      return res.status(500).json({
+        success: false,
+        message: "ImageKit credentials are not configured in environment variables / .env."
+      });
+    }
+
     const { base64Data, fileName } = req.body;
     if (!base64Data) {
       return res.status(400).json({
