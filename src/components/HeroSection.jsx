@@ -19,21 +19,21 @@ export const HeroSection = ({ onOpenQuiz, onExploreShop }) => {
             {/* Top Pill Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 text-[#64263C] text-xs font-bold uppercase tracking-widest border border-pink-200 shadow-sm">
               <Sparkles className="w-3.5 h-3.5 text-[#D6B477]" />
-              <span>India's Luxury Press-On Nail Atelier</span>
+              <span>Welcome to Games of Gloss</span>
             </div>
 
             {/* Main Editorial Headline */}
             <h1 className="text-4xl sm:text-6xl xl:text-7xl font-serif text-[#64263C] leading-[1.08] tracking-tight">
-              Your Nails.<br />
-              <span className="italic font-normal text-[#64263C]">Your Rules.</span><br />
+              A Little Gloss.<br />
+              <span className="italic font-normal text-[#64263C]">A Lot of</span><br />
               <span className="bg-gradient-to-r from-[#64263C] via-[#D6B477] to-[#64263C] bg-clip-text text-transparent">
-                Your Vibe.
+                Glam.
               </span>
             </h1>
 
             {/* Supporting Subtext */}
             <p className="text-base sm:text-lg text-[#5A5255] max-w-xl mx-auto lg:mx-0 font-light leading-relaxed">
-              Meet your next obsession. Discover handcrafted press-on nail sets made for every mood, moment, and version of you. Salon-grade gel finish in just 10 minutes at home.
+              Your destination for handcrafted press-on nails, statement jewellery and little luxuries. Thoughtfully curated to celebrate your individuality, elevate your everyday style and add a touch of glamour to every moment.
             </p>
 
             {/* Action CTA Buttons */}
@@ -50,7 +50,7 @@ export const HeroSection = ({ onOpenQuiz, onExploreShop }) => {
                 onClick={onExploreShop}
                 className="btn-secondary w-full sm:w-auto px-8 py-4 text-base font-bold flex items-center justify-center gap-2 hover:border-[#64263C]"
               >
-                <span>Shop Nail Sets</span>
+                <span>Shop Nails</span>
                 <ArrowRight className="w-4 h-4 text-[#64263C]" />
               </button>
             </div>

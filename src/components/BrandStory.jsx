@@ -10,7 +10,7 @@ export const BrandStory = ({ onOpenCustomOrder, onOpenQuiz }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-20">
           {/* Atelier Photography */}
           <div className="lg:col-span-5 relative order-2 lg:order-1">
-            <div className="relative mx-auto max-w-md lg:max-w-none">
+            <div className="relative mx-auto max-w-md lg:max-w-none pb-6">
               <div className="rounded-[32px] overflow-hidden shadow-2xl border-4 border-[#FFF9F5] aspect-square bg-pink-100">
                 <img
                   src="/images/custom_nail.jpg"
@@ -21,7 +21,7 @@ export const BrandStory = ({ onOpenCustomOrder, onOpenQuiz }) => {
               </div>
 
               {/* Floating Highlight Card */}
-              <div className="absolute -bottom-6 -right-4 sm:-right-8 glass-panel p-4 rounded-2xl shadow-xl max-w-xs border border-pink-200">
+              <div className="absolute bottom-0 right-2 sm:right-4 glass-panel p-4 rounded-2xl shadow-xl max-w-xs border border-pink-200 z-10">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping" />
                   <span className="text-xs font-bold text-[#64263C]">Handcrafted in India</span>
@@ -42,16 +42,25 @@ export const BrandStory = ({ onOpenCustomOrder, onOpenQuiz }) => {
 
             <h2 className="text-3xl sm:text-5xl font-serif font-bold text-[#64263C] leading-tight">
               A Little Gloss.<br />
-              <span className="italic font-normal">A Lot of Personality.</span>
+              <span className="italic font-normal">A Lot of Glam.</span>
             </h2>
 
             <p className="text-sm sm:text-base text-[#5A5255] font-light leading-relaxed">
-              We started <strong>Games of Gloss</strong> with a simple belief: you shouldn't have to choose between salon-quality nails and your time, wallet, or natural nail health. Traditional gel appointments take 2 hours, cost a fortune, and weaken your natural nail beds under harsh UV lamps.
+              Welcome to <strong>Games of Gloss</strong> — your destination for handcrafted press-on nails, statement jewellery and little luxuries. Thoughtfully curated to celebrate your individuality, elevate your everyday style and add a touch of glamour to every moment.
             </p>
 
             <p className="text-sm sm:text-base text-[#5A5255] font-light leading-relaxed">
-              Our handcrafted press-on sets give you the freedom to match your nails to your mood, outfit, or weekend trip in just 10 minutes. Whether you are in your <em>Clean Girl Era</em> for morning meetings or switching to razor-sharp <em>Baddie Chrome</em> for Friday night, Games of Gloss is your personal on-demand beauty atelier.
+              We believe beauty lies in the little details — a perfectly styled set of nails, an accessory that completes your outfit, or a little something that makes you feel confident and beautiful. From statement nails to everyday accessories, every piece is chosen to help you celebrate your individuality without compromising on style or affordability.
             </p>
+
+            <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-pink-200/80">
+              <p className="text-xs sm:text-sm font-serif italic text-[#64263C]">
+                “Because you deserve to feel like your most glamorous self — every single day.”
+              </p>
+              <span className="text-[11px] font-semibold text-[#D6B477] uppercase tracking-wider block mt-1">
+                — Team Games of Gloss 💌
+              </span>
+            </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
               <div className="p-4 rounded-2xl bg-[#FFF9F5] border border-pink-100">

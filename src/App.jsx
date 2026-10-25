@@ -15,11 +15,27 @@ import { ProductDetailModal } from "./components/ProductDetailModal.jsx";
 import { SizingGuideModal } from "./components/SizingGuideModal.jsx";
 import { CustomOrderModal } from "./components/CustomOrderModal.jsx";
 import { CartDrawer } from "./components/CartDrawer.jsx";
+import { AdminPortal } from "./components/AdminPortal.jsx";
+import { getStoredProducts, subscribeProducts, syncProductsWithDb } from "./data/productStore.js";
 import { Sparkles, X, CheckCircle, Heart, ArrowUp } from "lucide-react";
 
 export function App() {
-  // Navigation: 'home' | 'shop' | 'about' | 'contact'
-  const [activeTab, setActiveTab] = useState("home");
+  // Navigation: 'home' | 'shop' | 'about' | 'contact' | 'admin'
+  const [activeTab, setActiveTab] = useState(() => {
+    return window.location.hash === "#admin" ? "admin" : "home";
+  });
+
+  const handleTabChange = (tab) => {
+    if (tab === "admin") {
+      window.location.hash = "#admin";
+    } else if (window.location.hash === "#admin") {
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+    setActiveTab(tab);
+  };
+
+  // Dynamic Product Catalog State
+  const [products, setProducts] = useState(() => getStoredProducts());
 
   // Modals & Drawers
   const [quizModalOpen, setQuizModalOpen] = useState(false);
@@ -79,6 +95,39 @@ export function App() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Sync with MongoDB Atlas on initial website load
+  useEffect(() => {
+    syncProductsWithDb()
+      .then((dbProducts) => {
+        if (dbProducts && Array.isArray(dbProducts)) {
+          setProducts(dbProducts);
+        }
+      })
+      .catch((err) => {
+        console.warn("MongoDB initial sync notice:", err.message);
+      });
+  }, []);
+
+  // Subscribe to dynamic product store updates
+  useEffect(() => {
+    const unsubscribe = subscribeProducts((updatedProducts) => {
+      setProducts(updatedProducts);
+    });
+    return unsubscribe;
+  }, []);
+
+  // Hash route listener (#admin)
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === "#admin") {
+        setActiveTab("admin");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    };
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
   }, []);
 
   const showToast = (message) => {
@@ -166,7 +215,7 @@ export function App() {
       {/* Navigation */}
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         cartCount={totalCartCount}
         onOpenCart={() => setCartDrawerOpen(true)}
         onOpenQuiz={() => setQuizModalOpen(true)}
@@ -194,11 +243,12 @@ export function App() {
 
             {/* 3. Bestsellers Section */}
             <BestsellersSection
+              products={products}
               onQuickView={(prod) => setQuickViewProduct(prod)}
               wishlist={wishlist}
               onToggleWishlist={handleToggleWishlist}
               onExploreShop={() => {
-                setActiveTab("shop");
+                handleTabChange("shop");
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             />
@@ -219,6 +269,7 @@ export function App() {
 
         {activeTab === "shop" && (
           <ShopPage
+            products={products}
             initialCollectionFilter={shopCategoryFilter}
             onQuickView={(prod) => setQuickViewProduct(prod)}
             wishlist={wishlist}
@@ -229,17 +280,30 @@ export function App() {
 
         {activeTab === "about" && (
           <AboutSection
+            setActiveTab={handleTabChange}
             onOpenQuiz={() => setQuizModalOpen(true)}
             onOpenCustomOrder={() => setCustomOrderModalOpen(true)}
           />
         )}
 
         {activeTab === "contact" && <ContactSection />}
+
+        {activeTab === "admin" && (
+          <AdminPortal
+            products={products}
+            onRefreshProducts={() => setProducts(getStoredProducts())}
+            onViewProductInStore={(prod) => setQuickViewProduct(prod)}
+            onSwitchToShop={() => {
+              handleTabChange("shop");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          />
+        )}
       </main>
 
       {/* Footer */}
       <Footer
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         onOpenQuiz={() => setQuizModalOpen(true)}
         onOpenSizing={() => setSizingModalOpen(true)}
         onOpenCustomOrder={() => setCustomOrderModalOpen(true)}

@@ -6,18 +6,18 @@
 export const BRAND_CONFIG = {
   name: "Games of Gloss",
   shortName: "GOG",
-  tagline: "Your Nails. Your Rules. Your Vibe.",
-  subtitle: "Meet your next obsession. Handcrafted luxury press-on nail sets tailored to your personal aesthetic.",
+  tagline: "A Little Gloss. A Lot of Glam.",
+  subtitle: "Your destination for handcrafted press-on nails, statement jewellery and little luxuries. Thoughtfully curated to celebrate your individuality, elevate your everyday style and add a touch of glamour to every moment.",
   
   // Announcement ticker text
-  announcementText: "Your dream nails, delivered 💌 | Discover your signature nail vibe.",
+  announcementText: "A Little Gloss. A Lot of Glam. ✨ | Handcrafted nails & statement jewellery",
   announcementSub: "Handcrafted Luxury • Reusable up to 5x • Salon Finish in 10 Mins 💅🏻",
   announcements: [
     {
-      id: "dream-nails",
-      text: "Your dream nails, delivered 💌",
-      sub: "Discover your signature nail vibe",
-      action: "shop"
+      id: "brand-tagline",
+      text: "A Little Gloss. A Lot of Glam. ✨",
+      sub: "All things beautiful, bold & effortlessly stylish",
+      action: "about"
     },
     {
       id: "free-shipping",
@@ -39,15 +39,15 @@ export const BRAND_CONFIG = {
     }
   ],
   
-  // WhatsApp Configuration (Replace with actual WhatsApp business number when live)
+  // WhatsApp Configuration (Direct contact & order concierge)
   // Format: country code + 10 digit number without '+' or '-'
-  whatsappNumber: "919876543210", 
-  whatsappDisplayNumber: "+91 98765 43210",
+  whatsappNumber: "918178187385", 
+  whatsappDisplayNumber: "+91 81781 87385",
   
   // Social links & contacts
-  instagramHandle: "@gamesofgloss",
-  instagramUrl: "https://instagram.com/gamesofgloss",
-  email: "hello@gamesofgloss.com",
+  instagramHandle: "@games_of_gloss",
+  instagramUrl: "https://www.instagram.com/games_of_gloss/",
+  email: "Gamesofgloss@gmail.com",
   location: "New Delhi & Mumbai, India",
   shippingNote: "Pan-India Express Delivery (3–5 business days)",
   freeShippingThreshold: 999,
@@ -68,7 +68,7 @@ export const BRAND_CONFIG = {
     {
       icon: "PackageCheck",
       title: "Complete Prep Kit Included",
-      description: "Every set comes with salon glue, adhesive jelly tabs, cuticle pusher, buffer & alcohol prep."
+      description: "Every set arrives in a keepsake box with professional nail glue, adhesive glue tabs, nail buffer, nail filer, cuticle pusher & alcohol prep pads."
     },
     {
       icon: "HeartHandshake",

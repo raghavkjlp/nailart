@@ -1,13 +1,15 @@
 import React, { useState } from "react";
-import { Sparkles, ArrowRight, Flame } from "lucide-react";
+import { Sparkles, ArrowRight, Flame, Plus } from "lucide-react";
 import { PRODUCTS } from "../data/products.js";
 import { ProductCard } from "./ProductCard.jsx";
 
 export const BestsellersSection = ({
+  products = PRODUCTS,
   onQuickView,
   wishlist = [],
   onToggleWishlist,
-  onExploreShop
+  onExploreShop,
+  onOpenAdmin
 }) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -19,14 +21,49 @@ export const BestsellersSection = ({
     { id: "baddie", label: "Baddie Energy 🖤" }
   ];
 
-  const filteredBestsellers = PRODUCTS.filter((p) => {
-    if (activeTab === "all") return p.rating >= 4.9 || p.badge.includes("Bestseller") || p.badge.includes("Viral");
-    if (activeTab === "coquette") return p.collection.includes("Coquette");
-    if (activeTab === "clean") return p.collection.includes("Clean Girl");
-    if (activeTab === "chrome") return p.collection.includes("Chrome");
-    if (activeTab === "baddie") return p.collection.includes("Baddie");
+  const activeProducts = (products || []).filter((p) => p.isAvailable !== false);
+
+  const filteredBestsellers = activeProducts.filter((p) => {
+    if (activeTab === "all") {
+      return (
+        p.rating >= 4.9 ||
+        p.badge?.includes("Bestseller") ||
+        p.badge?.includes("Viral") ||
+        activeProducts.length <= 6
+      );
+    }
+    if (activeTab === "coquette") return p.collection?.includes("Coquette");
+    if (activeTab === "clean") return p.collection?.includes("Clean Girl");
+    if (activeTab === "chrome") return p.collection?.includes("Chrome");
+    if (activeTab === "baddie") return p.collection?.includes("Baddie");
     return true;
   }).slice(0, 6);
+
+  // If no products at all in store
+  if (activeProducts.length === 0) {
+    return (
+      <section className="py-12 bg-gradient-to-b from-[#FFF9F5] via-[#F8DCE5]/20 to-[#FFF9F5] border-t border-pink-100">
+        <div className="container-custom text-center">
+          <div className="p-8 rounded-3xl bg-white border border-pink-200 shadow-sm max-w-lg mx-auto">
+            <span className="text-2xl mb-2 block">💅🏻</span>
+            <h3 className="font-serif font-bold text-xl text-[#64263C] mb-2">
+              Signature Sets Dropping Soon
+            </h3>
+            <p className="text-xs text-[#5A5255] mb-4">
+              Explore our complete bespoke press-on catalog or order a custom sizing set tailored to your exact nail beds!
+            </p>
+            <button
+              onClick={() => onSelectProduct && onSelectProduct(null)}
+              className="px-5 py-2.5 rounded-full bg-[#64263C] text-white text-xs font-bold hover:bg-[#4E1C2E] inline-flex items-center gap-1.5 shadow-sm"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#D6B477]" />
+              <span>Explore Boutique 💅🏻</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 sm:py-24 bg-gradient-to-b from-[#FFF9F5] via-[#F8DCE5]/30 to-[#FFF9F5] border-t border-pink-100">
@@ -50,7 +87,7 @@ export const BestsellersSection = ({
             onClick={onExploreShop}
             className="inline-flex items-center gap-2 text-xs font-bold text-[#64263C] hover:text-[#4E1C2E] border-b-2 border-[#64263C] pb-1 w-fit group"
           >
-            <span>View All Nail Sets ({PRODUCTS.length})</span>
+            <span>View All Nail Sets ({activeProducts.length})</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

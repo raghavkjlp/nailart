@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Sparkles, Heart, Shield, CheckCircle, HelpCircle, ChevronDown } from "lucide-react";
+import { Sparkles, Heart, Shield, CheckCircle, ChevronDown, ShoppingBag, ArrowRight, Star, Gem, Smile } from "lucide-react";
 import { BRAND_CONFIG } from "../config/brandConfig.js";
 
-export const AboutSection = ({ onOpenQuiz, onOpenCustomOrder }) => {
+export const AboutSection = ({ setActiveTab, onOpenQuiz, onOpenCustomOrder }) => {
   const [openFaq, setOpenFaq] = useState(null);
 
   const faqs = [
@@ -24,66 +24,277 @@ export const AboutSection = ({ onOpenQuiz, onOpenCustomOrder }) => {
     },
     {
       q: "What comes in each Games of Gloss package?",
-      a: "Every single set arrives in a luxury keepsake box containing: 10 handcrafted press-on nails, 1 tube of professional salon liquid glue (2g), 24 double-sided jelly adhesive tabs, 1 dual-sided wooden cuticle stick, 1 mini nail buffer, and 2 alcohol prep pads."
+      a: (
+        <div className="space-y-2.5">
+          <p>
+            Every Games of Gloss set arrives in a beautiful keepsake box, thoughtfully packed with everything you need for your perfect nail transformation.
+          </p>
+          <div>
+            <p className="font-semibold text-[#64263C] mb-1.5">Each package includes:</p>
+            <ul className="space-y-1 pl-1">
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>10 handcrafted press-on nails</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>Professional nail glue</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>Double-sided adhesive glue tabs</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>1 nail buffer</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>1 nail filer</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>1 cuticle pusher</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-[#D6B477] font-bold">•</span>
+                <span>Alcohol prep pad(s)</span>
+              </li>
+            </ul>
+          </div>
+          <p className="pt-1">
+            Everything you need to achieve a gorgeous, salon-inspired manicure from the comfort of your home. 💅
+          </p>
+        </div>
+      )
     }
   ];
 
   return (
     <div className="py-12 sm:py-20 bg-[#FFF9F5]">
       <div className="container-custom">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 text-[#64263C] text-[11px] font-bold uppercase tracking-wider mb-3">
+        {/* Header Section */}
+        <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-pink-100 text-[#64263C] text-[11px] font-bold uppercase tracking-wider mb-4 border border-pink-200/60 shadow-sm">
             <Sparkles className="w-3.5 h-3.5 text-[#D6B477]" />
-            Behind The Gloss
-          </div>
-          <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[#64263C] mb-4">
             About Games of Gloss
+          </div>
+          
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold text-[#64263C] leading-tight mb-4">
+            A Little Gloss.<br />
+            <span className="italic font-normal bg-gradient-to-r from-[#64263C] via-[#D6B477] to-[#64263C] bg-clip-text text-transparent">
+              A Lot of Glam.
+            </span>
           </h1>
-          <p className="text-xs sm:text-sm text-[#5A5255] font-light leading-relaxed">
-            Redefining luxury nail artistry for modern women who demand beauty on their own terms.
+          
+          <p className="text-base sm:text-lg text-[#5A5255] font-light leading-relaxed max-w-2xl mx-auto">
+            Welcome to <strong className="font-semibold text-[#64263C]">Games of Gloss</strong> — your destination for handcrafted press-on nails, statement jewellery and little luxuries. Thoughtfully curated to celebrate your individuality, elevate your everyday style and add a touch of glamour to every moment.
           </p>
         </div>
 
-        {/* Story Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-20">
-          <div className="rounded-3xl overflow-hidden shadow-xl border-4 border-white aspect-[4/3] bg-pink-100">
-            <img
-              src="/images/bridal_nail.jpg"
-              alt="Games of Gloss Craftsmanship"
-              className="w-full h-full object-cover"
-            />
+        {/* Editorial Story Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center mb-20 sm:mb-24">
+          {/* Visual Showcase (5 cols) */}
+          <div className="lg:col-span-5 relative order-2 lg:order-1">
+            <div className="relative mx-auto max-w-md lg:max-w-none">
+              <div className="rounded-[32px] overflow-hidden shadow-2xl border-4 border-white aspect-[4/5] bg-pink-100 relative group">
+                <img
+                  src="/images/bridal_nail.jpg"
+                  alt="Games of Gloss Handcrafted Press-On Nails and Accessories"
+                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+
+                {/* Badges anchored safely at top inside photo */}
+                <div className="absolute top-4 left-4 glass-panel py-1.5 px-3.5 rounded-full shadow-md border border-white/60 flex items-center gap-1.5 z-10">
+                  <span className="text-xs">✨</span>
+                  <span className="text-[11px] font-bold text-[#64263C]">Nails &amp; Accessories</span>
+                </div>
+
+                <div className="absolute top-4 right-4 glass-panel py-1.5 px-3.5 rounded-full shadow-md border border-white/60 flex items-center gap-1.5 z-10">
+                  <Heart className="w-3 h-3 fill-[#F3B6CB] text-[#64263C]" />
+                  <span className="text-[11px] font-bold text-[#64263C]">Curated with Love</span>
+                </div>
+
+                {/* Bottom caption */}
+                <div className="absolute bottom-6 left-6 right-6 text-white">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#D6B477] block mb-1">
+                    Everyday Glamour
+                  </span>
+                  <p className="font-serif text-lg sm:text-xl font-bold leading-snug">
+                    Designed to make every look feel special.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-5">
-            <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[#64263C] leading-snug">
-              Born from a Love of Art & a Hatred of Salon Damage
-            </h2>
-            <p className="text-xs sm:text-sm text-[#5A5255] leading-relaxed">
-              Games of Gloss began in a sunlit home studio in New Delhi with a mission to make salon-sculpted, Pinterest-worthy nail art accessible without hours trapped in a salon chair or spending thousands on sets that ruin your natural nails.
+          {/* Copy Story (7 cols) */}
+          <div className="lg:col-span-7 space-y-6 order-1 lg:order-2">
+            <div className="space-y-3">
+              <span className="text-xs font-bold tracking-widest uppercase text-[#D6B477]">
+                Our Passion &amp; Purpose
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-serif font-bold text-[#64263C] leading-snug">
+                Born from a love for beauty &amp; self-expression.
+              </h2>
+            </div>
+
+            <p className="text-sm sm:text-base text-[#5A5255] leading-relaxed font-light">
+              Born from a love for beauty and self-expression, <strong>Games of Gloss</strong> brings together thoughtfully curated nail essentials, stunning press-on nails and chic accessories designed to make every look feel special.
             </p>
-            <p className="text-xs sm:text-sm text-[#5A5255] leading-relaxed">
-              Every single nail in our collection is treated like a miniature canvas. Handcrafted with multiple layers of salon-grade gel resin, diamond chrome powders, 3D porcelain florals, and hand-placed crystals, our sets look indistinguishable from bespoke high-fashion manicures.
+
+            {/* Editorial Highlight Quote Box */}
+            <div className="relative p-6 sm:p-7 rounded-2xl bg-white border-l-4 border-[#64263C] shadow-sm">
+              <span className="text-3xl sm:text-4xl font-serif text-[#D6B477] absolute top-2 right-4 select-none opacity-40">
+                “
+              </span>
+              <p className="font-serif italic text-sm sm:text-base text-[#64263C] leading-relaxed">
+                We believe beauty lies in the little details — a perfectly styled set of nails, an accessory that completes your outfit, or a little something that makes you feel confident and beautiful.
+              </p>
+            </div>
+
+            <p className="text-sm sm:text-base text-[#5A5255] leading-relaxed font-light">
+              Our collection is created for the girl who loves to express herself, experiment with her style and add a touch of glamour to her everyday life.
+            </p>
+
+            <p className="text-sm sm:text-base text-[#5A5255] leading-relaxed font-light">
+              From statement nails to everyday accessories, every piece is chosen to help you celebrate your individuality without compromising on style or affordability.
             </p>
 
             <div className="pt-2 flex flex-wrap gap-3">
               <button
                 onClick={onOpenQuiz}
-                className="btn-primary text-xs py-3 px-6"
+                className="btn-primary text-xs py-3 px-6 shadow-md hover:shadow-lg flex items-center gap-2"
               >
-                Find Your Vibe Quiz ✨
+                <span>Find Your Vibe Quiz</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#D6B477]" />
               </button>
+              
+              {setActiveTab && (
+                <button
+                  onClick={() => {
+                    setActiveTab("shop");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="btn-secondary text-xs py-3 px-6 flex items-center gap-2"
+                >
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Shop Collections</span>
+                </button>
+              )}
+
               <button
                 onClick={onOpenCustomOrder}
-                className="btn-secondary text-xs py-3 px-6"
+                className="text-xs py-3 px-5 rounded-full border border-pink-200 text-[#64263C] hover:bg-pink-100/60 font-semibold transition-all"
               >
-                Commission Custom Set 🎨
+                Custom Nail Order 🎨
               </button>
             </div>
           </div>
         </div>
 
-        {/* Quality Values */}
+        {/* 3 Core Values / Pillars */}
+        <div className="mb-20">
+          <div className="text-center max-w-xl mx-auto mb-12">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[#D6B477] block mb-1">
+              What Drives Us
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-serif font-bold text-[#64263C]">
+              The Games of Gloss Promise
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+            {/* Card 1 */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 rounded-2xl bg-pink-100 text-[#64263C] flex items-center justify-center mb-6 font-bold text-2xl shadow-sm border border-pink-200/60">
+                  💅🏻
+                </div>
+                <h4 className="font-serif font-bold text-xl text-[#64263C] mb-3">
+                  The Little Details
+                </h4>
+                <p className="text-sm text-[#5A5255] leading-relaxed font-light">
+                  A perfectly styled set of nails and chic accessories curated to complete your outfit and make you feel confident every single time.
+                </p>
+              </div>
+              <div className="pt-5 mt-6 border-t border-pink-100 flex items-center gap-1.5 text-xs font-semibold text-[#D6B477]">
+                <span>Thoughtfully curated</span>
+                <span className="text-sm">✨</span>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 rounded-2xl bg-pink-100 text-[#64263C] flex items-center justify-center mb-6 font-bold text-2xl shadow-sm border border-pink-200/60">
+                  ✨
+                </div>
+                <h4 className="font-serif font-bold text-xl text-[#64263C] mb-3">
+                  Style &amp; Affordability
+                </h4>
+                <p className="text-sm text-[#5A5255] leading-relaxed font-light">
+                  From statement nails to everyday essentials, every piece is chosen to celebrate your individuality without compromising on quality or budget.
+                </p>
+              </div>
+              <div className="pt-5 mt-6 border-t border-pink-100 flex items-center gap-1.5 text-xs font-semibold text-[#D6B477]">
+                <span>Affordable glamour</span>
+                <span className="text-sm">💎</span>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 rounded-2xl bg-pink-100 text-[#64263C] flex items-center justify-center mb-6 font-bold text-2xl shadow-sm border border-pink-200/60">
+                  💖
+                </div>
+                <h4 className="font-serif font-bold text-xl text-[#64263C] mb-3">
+                  Fun, Personal &amp; Accessible
+                </h4>
+                <p className="text-sm text-[#5A5255] leading-relaxed font-light">
+                  We believe that feeling beautiful should be fun, personal and accessible — empowering you to experiment and express your style effortlessly.
+                </p>
+              </div>
+              <div className="pt-5 mt-6 border-t border-pink-100 flex items-center gap-1.5 text-xs font-semibold text-[#D6B477]">
+                <span>Effortless self-expression</span>
+                <span className="text-sm">💌</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Client Love Note / Manifesto Banner */}
+        <div className="mb-20">
+          <div className="rounded-3xl bg-gradient-to-r from-pink-100/90 via-[#FFF9F5] to-pink-100/90 border border-pink-200 p-8 sm:p-14 text-center max-w-4xl mx-auto shadow-md relative overflow-hidden">
+            <div className="absolute top-4 left-6 text-2xl select-none opacity-40">✨</div>
+            <div className="absolute bottom-4 right-6 text-2xl select-none opacity-40">💖</div>
+
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-[#64263C] text-[10px] font-bold uppercase tracking-wider mb-4 border border-pink-200 shadow-sm">
+              <Heart className="w-3 h-3 text-[#64263C] fill-[#F3B6CB]" />
+              Our Core Philosophy
+            </div>
+
+            <blockquote className="font-serif text-xl sm:text-3xl text-[#64263C] font-semibold leading-relaxed mb-6 max-w-2xl mx-auto">
+              “At Games of Gloss, we believe that feeling beautiful should be fun, personal and accessible.<br />
+              <span className="italic font-normal text-[#D6B477] block mt-2 text-lg sm:text-2xl">
+                Because you deserve to feel like your most glamorous self — every single day.”
+              </span>
+            </blockquote>
+
+            <div className="pt-2 border-t border-pink-200/60 max-w-xs mx-auto">
+              <p className="text-sm font-serif font-bold text-[#64263C]">
+                With love,
+              </p>
+              <p className="text-sm font-semibold text-[#D6B477] tracking-wider uppercase mt-0.5">
+                Team Games of Gloss 💌
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quality Values Badges */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
           <div className="p-6 rounded-3xl bg-white border border-pink-200/80 shadow-sm text-center">
             <div className="w-12 h-12 rounded-2xl bg-pink-100 text-[#64263C] flex items-center justify-center mx-auto mb-4 font-bold text-xl">

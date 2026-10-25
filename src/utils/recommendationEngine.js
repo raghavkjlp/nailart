@@ -3,7 +3,7 @@
 // Multi-factor weighted scoring algorithm for personalized nail recommendations
 // ============================================================================
 
-import { PRODUCTS } from "../data/products.js";
+import { getStoredProducts } from "../data/productStore.js";
 
 /**
  * Budget range parser helper
@@ -80,18 +80,8 @@ export const calculateArchetype = (answers) => {
 
 /**
  * Main recommendation calculator
- * Takes user answers object:
- * {
- *   aesthetic: string,
- *   length: string,
- *   shape: string,
- *   colors: string[],
- *   occasion: string,
- *   budget: string,
- *   personality: string
- * }
  */
-export const calculateRecommendations = (answers) => {
+export const calculateRecommendations = (answers, customProducts = null) => {
   const {
     aesthetic = "",
     length = "",
@@ -102,33 +92,52 @@ export const calculateRecommendations = (answers) => {
     personality = ""
   } = answers;
 
-  // Filter available products only
-  const availableProducts = PRODUCTS.filter((p) => p.isAvailable);
+  const catalog = customProducts || getStoredProducts();
+  const availableProducts = catalog.filter((p) => p.isAvailable !== false);
 
   const scoredProducts = availableProducts.map((product) => {
     let score = 0;
     const matchReasons = [];
 
     // 1. Aesthetic match: +5 points
-    if (aesthetic && product.aestheticTags.some((tag) => tag.toLowerCase().includes(aesthetic.toLowerCase()) || aesthetic.toLowerCase().includes(tag.toLowerCase()))) {
+    if (
+      aesthetic &&
+      ((product.aestheticTags &&
+        product.aestheticTags.some(
+          (tag) =>
+            tag.toLowerCase().includes(aesthetic.toLowerCase()) ||
+            aesthetic.toLowerCase().includes(tag.toLowerCase())
+        )) ||
+        (product.collection &&
+          product.collection.toLowerCase().includes(aesthetic.toLowerCase())))
+    ) {
       score += 5;
       matchReasons.push(`Matches your ${aesthetic} aesthetic`);
     }
 
     // 2. Nail shape match: +4 points
-    if (shape && product.shape.toLowerCase() === shape.toLowerCase()) {
+    if (
+      shape &&
+      (product.shape?.toLowerCase() === shape.toLowerCase() ||
+        (product.availableShapes &&
+          product.availableShapes.some((s) => s.toLowerCase() === shape.toLowerCase())))
+    ) {
       score += 4;
       matchReasons.push(`Features your favorite ${shape} silhouette`);
     }
 
     // 3. Length match: +4 points
-    if (length && product.availableLengths.includes(length)) {
+    if (
+      length &&
+      (product.defaultLength === length ||
+        (product.availableLengths && product.availableLengths.includes(length)))
+    ) {
       score += 4;
       matchReasons.push(`Available in your ideal ${length} length`);
     }
 
     // 4. Color preference match: +3 points
-    if (Array.isArray(colors) && colors.length > 0) {
+    if (Array.isArray(colors) && colors.length > 0 && product.colors) {
       const matchingColor = colors.find((c) => product.colors.includes(c));
       if (matchingColor) {
         score += 3;
@@ -137,13 +146,13 @@ export const calculateRecommendations = (answers) => {
     }
 
     // 5. Occasion match: +3 points
-    if (occasion && product.occasions.includes(occasion)) {
+    if (occasion && product.occasions && product.occasions.includes(occasion)) {
       score += 3;
       matchReasons.push(`Perfect for ${occasion}`);
     }
 
     // 6. Personality/vibe match: +2 points
-    if (personality && product.personalityTags.includes(personality)) {
+    if (personality && product.personalityTags && product.personalityTags.includes(personality)) {
       score += 2;
       matchReasons.push(`Embodies that ${personality} feel`);
     }

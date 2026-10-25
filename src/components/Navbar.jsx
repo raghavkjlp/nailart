@@ -151,14 +151,13 @@ export const Navbar = ({
           {/* Announcement Content (Clickable) */}
           <div
             onClick={() => handleAnnouncementClick(currentAnnouncement.action)}
-            className={`flex-1 min-w-0 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 text-center transition-all duration-300 ease-in-out ${
-              announcementFade
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 -translate-y-1"
-            }`}
+            className={`flex-1 min-w-0 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 text-center transition-all duration-300 ease-in-out ${announcementFade
+              ? "opacity-100 translate-y-0"
+              : "opacity-0 -translate-y-1"
+              }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-[#D6B477] animate-sparkle shrink-0" />
-            
+
             {/* Primary message: Fits on every phone without clipping or horizontal overflow */}
             <span className="font-semibold text-[11px] sm:text-xs text-[#FFF9F5] tracking-wide truncate">
               {currentAnnouncement.text}
@@ -191,11 +190,10 @@ export const Navbar = ({
 
       {/* 2. Main Navigation Bar */}
       <nav
-        className={`w-full transition-all duration-300 ${
-          isScrolled
-            ? "bg-[#FFF9F5]/90 backdrop-blur-md shadow-md py-3 border-b border-pink-200/50"
-            : "bg-[#FFF9F5]/80 backdrop-blur-sm py-4 border-b border-pink-100"
-        }`}
+        className={`w-full transition-all duration-300 ${isScrolled
+          ? "bg-[#FFF9F5]/90 backdrop-blur-md shadow-md py-3 border-b border-pink-200/50"
+          : "bg-[#FFF9F5]/80 backdrop-blur-sm py-4 border-b border-pink-100"
+          }`}
       >
         <div className="container-custom flex items-center justify-between gap-4">
           {/* Mobile Menu Button */}
@@ -229,11 +227,10 @@ export const Navbar = ({
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`text-sm font-semibold tracking-wide transition-all duration-200 relative py-1 whitespace-nowrap shrink-0 ${
-                  activeTab === item.id
-                    ? "text-[#64263C]"
-                    : "text-[#5A5255] hover:text-[#64263C]"
-                }`}
+                className={`text-sm font-semibold tracking-wide transition-all duration-200 relative py-1 whitespace-nowrap shrink-0 ${activeTab === item.id
+                  ? "text-[#64263C]"
+                  : "text-[#5A5255] hover:text-[#64263C]"
+                  }`}
               >
                 {item.label}
                 {activeTab === item.id && (
@@ -277,13 +274,12 @@ export const Navbar = ({
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`block w-full text-left py-2.5 px-3 rounded-xl text-base font-semibold ${
-                  item.isSpecial
-                    ? "bg-pink-100 text-[#64263C] font-bold"
-                    : activeTab === item.id
+                className={`block w-full text-left py-2.5 px-3 rounded-xl text-base font-semibold ${item.isSpecial
+                  ? "bg-pink-100 text-[#64263C] font-bold"
+                  : activeTab === item.id
                     ? "text-[#64263C] bg-pink-50"
                     : "text-[#5A5255]"
-                }`}
+                  }`}
               >
                 {item.label}
               </button>

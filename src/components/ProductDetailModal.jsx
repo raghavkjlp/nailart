@@ -25,10 +25,28 @@ export const ProductDetailModal = ({
 }) => {
   if (!product) return null;
 
+  const displayedShapes = product.availableShapes?.length
+    ? BRAND_CONFIG.shapes.filter((s) => product.availableShapes.includes(s.id))
+    : BRAND_CONFIG.shapes;
+
+  const displayedLengths = product.availableLengths?.length
+    ? product.availableLengths
+    : ["Short", "Medium", "Long", "Extra Long"];
+
+  const displayedSizes = product.availableSizes?.length
+    ? product.availableSizes
+    : ["XS", "S", "M", "L", "Custom"];
+
   const [selectedImage, setSelectedImage] = useState(product.image);
-  const [selectedShape, setSelectedShape] = useState(product.shape);
-  const [selectedLength, setSelectedLength] = useState(product.defaultLength);
-  const [selectedSize, setSelectedSize] = useState("M");
+  const [selectedShape, setSelectedShape] = useState(
+    product.shape || displayedShapes[0]?.id || "Almond"
+  );
+  const [selectedLength, setSelectedLength] = useState(
+    product.defaultLength || displayedLengths[0] || "Medium"
+  );
+  const [selectedSize, setSelectedSize] = useState(
+    product.defaultSize || displayedSizes[0] || "M"
+  );
   const [activeTab, setActiveTab] = useState("application"); // 'application' | 'details' | 'removal'
   const [addedAnimation, setAddedAnimation] = useState(false);
 
@@ -52,6 +70,11 @@ export const ProductDetailModal = ({
     selectedLength,
     selectedSize
   });
+
+  const discountAmount =
+    product.originalPrice && product.originalPrice > product.price
+      ? product.originalPrice - product.price
+      : 0;
 
   return (
     <div className="modal-backdrop">
@@ -141,9 +164,11 @@ export const ProductDetailModal = ({
                   {product.originalPrice && (
                     <span className="text-base text-gray-400 line-through">₹{product.originalPrice}</span>
                   )}
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                    Save ₹{product.originalPrice - product.price}
-                  </span>
+                  {discountAmount > 0 && (
+                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                      Save ₹{discountAmount}
+                    </span>
+                  )}
                 </div>
 
                 {/* Description */}
@@ -159,7 +184,7 @@ export const ProductDetailModal = ({
                     </label>
                   </div>
                   <div className="grid grid-cols-5 gap-2">
-                    {BRAND_CONFIG.shapes.map((s) => (
+                    {displayedShapes.map((s) => (
                       <button
                         key={s.id}
                         onClick={() => setSelectedShape(s.id)}
@@ -186,7 +211,7 @@ export const ProductDetailModal = ({
                     2. Select Length: <span className="text-[#64263C] font-serif">{selectedLength}</span>
                   </label>
                   <div className="grid grid-cols-4 gap-2">
-                    {["Short", "Medium", "Long", "Extra Long"].map((len) => (
+                    {displayedLengths.map((len) => (
                       <button
                         key={len}
                         onClick={() => setSelectedLength(len)}
@@ -217,7 +242,7 @@ export const ProductDetailModal = ({
                     </button>
                   </div>
                   <div className="grid grid-cols-5 gap-2">
-                    {["XS", "S", "M", "L", "Custom"].map((sz) => (
+                    {displayedSizes.map((sz) => (
                       <button
                         key={sz}
                         onClick={() => setSelectedSize(sz)}

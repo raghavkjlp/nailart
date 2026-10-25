@@ -126,10 +126,10 @@ Edit phone number, announcement bar, Instagram handle, and shipping rules:
 ```javascript
 export const BRAND_CONFIG = {
   name: "Games of Gloss",
-  whatsappNumber: "919876543210", // Replace with your actual WhatsApp business number
-  whatsappDisplayNumber: "+91 98765 43210",
-  instagramHandle: "@gamesofgloss",
-  instagramUrl: "https://instagram.com/gamesofgloss",
+  whatsappNumber: "918178187385", // WhatsApp business number
+  whatsappDisplayNumber: "+91 81781 87385",
+  instagramHandle: "@games_of_gloss",
+  instagramUrl: "https://www.instagram.com/games_of_gloss/",
   freeShippingThreshold: 999, // In INR
   ...
 };

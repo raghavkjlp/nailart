@@ -22,7 +22,7 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
         {/* Top Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
           {/* Brand Info (2 cols) */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-3 pb-8 lg:pb-0 border-b border-white/10 lg:border-none">
             <div className="flex items-center gap-2">
               <span className="font-serif text-2xl sm:text-3xl font-extrabold tracking-wider text-white">
                 GAMES OF GLOSS
@@ -30,8 +30,12 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
               <span className="text-xl">💅🏻</span>
             </div>
 
+            <p className="text-sm font-semibold text-[#D6B477] tracking-wide">
+              A Little Gloss. A Lot of Glam.
+            </p>
+
             <p className="text-xs sm:text-sm text-gray-400 font-light max-w-sm leading-relaxed">
-              India's premium handcrafted press-on nail brand. Dedicated to empowering self-expression through salon-quality, reusable nail artistry you can apply in 10 minutes.
+              Your destination for handcrafted press-on nails, statement jewellery and little luxuries. Thoughtfully curated to celebrate your individuality, elevate your everyday style and add a touch of glamour to every moment.
             </p>
 
             <div className="flex items-center gap-3 pt-2">
@@ -90,7 +94,18 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
                   }}
                   className="hover:text-[#F3B6CB] transition-colors"
                 >
-                  Shop Nail Sets
+                  Shop Nails
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveTab("shop");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="hover:text-[#F3B6CB] transition-colors"
+                >
+                  Shop Jewellery
                 </button>
               </li>
               <li>
@@ -115,7 +130,18 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
                   onClick={onOpenSizing}
                   className="hover:text-[#F3B6CB] transition-colors"
                 >
-                  Nail Sizing Guide (mm)
+                  Nail Sizing Guide
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveTab("admin");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  className="hover:text-[#F3B6CB] transition-colors text-[#D6B477] font-semibold flex items-center gap-1"
+                >
+                  <span>Admin Portal ⚙️</span>
                 </button>
               </li>
             </ul>
@@ -135,7 +161,7 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
                   }}
                   className="hover:text-[#F3B6CB] transition-colors"
                 >
-                  About Our Atelier
+                  About Games of Gloss
                 </button>
               </li>
               <li>
@@ -216,6 +242,17 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
           </div>
 
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                setActiveTab("admin");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="text-gray-400 hover:text-[#D6B477] transition-colors flex items-center gap-1 font-semibold"
+              title="Atelier Admin Portal"
+            >
+              <span>Admin ⚙️</span>
+            </button>
+            <span className="text-gray-600">•</span>
             <a
               href={createSupportUrl("Direct Help")}
               target="_blank"

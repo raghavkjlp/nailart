@@ -4,11 +4,13 @@ import { PRODUCTS } from "../data/products.js";
 import { ProductCard } from "./ProductCard.jsx";
 
 export const ShopPage = ({
+  products = PRODUCTS,
   onQuickView,
   initialCollectionFilter = null,
   wishlist = [],
   onToggleWishlist,
-  onOpenQuiz
+  onOpenQuiz,
+  onOpenAdmin
 }) => {
   // Filters State
   const [selectedAesthetic, setSelectedAesthetic] = useState(initialCollectionFilter || "All");
@@ -57,41 +59,47 @@ export const ShopPage = ({
 
   // Filtering & Sorting Logic
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return (products || []).filter((product) => {
+      // Visibility check
+      if (product.isAvailable === false) return false;
+
       // Search
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchesName = product.name.toLowerCase().includes(q);
-        const matchesDesc = product.shortDescription.toLowerCase().includes(q);
-        const matchesColl = product.collection.toLowerCase().includes(q);
+        const matchesName = product.name?.toLowerCase().includes(q);
+        const matchesDesc = (product.longDescription || product.shortDescription || "").toLowerCase().includes(q);
+        const matchesColl = product.collection?.toLowerCase().includes(q);
         if (!matchesName && !matchesDesc && !matchesColl) return false;
       }
 
       // Aesthetic
       if (selectedAesthetic !== "All") {
-        const matchesAesthetic = product.aestheticTags.some((tag) =>
+        const matchesAesthetic = product.aestheticTags?.some((tag) =>
           tag.toLowerCase().includes(selectedAesthetic.toLowerCase())
-        ) || product.collection.toLowerCase().includes(selectedAesthetic.toLowerCase());
+        ) || product.collection?.toLowerCase().includes(selectedAesthetic.toLowerCase());
         if (!matchesAesthetic) return false;
       }
 
       // Shape
-      if (selectedShape !== "All" && product.shape !== selectedShape) {
-        return false;
+      if (selectedShape !== "All") {
+        const hasShape = product.availableShapes
+          ? product.availableShapes.includes(selectedShape)
+          : product.shape === selectedShape;
+        if (!hasShape) return false;
       }
 
       // Length
-      if (selectedLength !== "All" && !product.availableLengths.includes(selectedLength)) {
+      if (selectedLength !== "All" && product.availableLengths && !product.availableLengths.includes(selectedLength)) {
         return false;
       }
 
       // Color
-      if (selectedColor !== "All" && !product.colors.includes(selectedColor)) {
+      if (selectedColor !== "All" && product.colors && !product.colors.includes(selectedColor)) {
         return false;
       }
 
       // Occasion
-      if (selectedOccasion !== "All" && !product.occasions.includes(selectedOccasion)) {
+      if (selectedOccasion !== "All" && product.occasions && !product.occasions.includes(selectedOccasion)) {
         return false;
       }
 
@@ -107,11 +115,12 @@ export const ShopPage = ({
     }).sort((a, b) => {
       if (sortBy === "price-low") return a.price - b.price;
       if (sortBy === "price-high") return b.price - a.price;
-      if (sortBy === "newest") return b.reviewCount - a.reviewCount;
+      if (sortBy === "newest") return (b.reviewCount || 0) - (a.reviewCount || 0);
       // Recommended: highest rating first
-      return b.rating - a.rating;
+      return (b.rating || 5) - (a.rating || 5);
     });
   }, [
+    products,
     selectedAesthetic,
     selectedShape,
     selectedLength,
@@ -409,8 +418,41 @@ export const ShopPage = ({
               </div>
             )}
 
-            {/* Product Cards Grid */}
-            {filteredProducts.length > 0 ? (
+            {/* Product Cards Grid or Empty Catalog States */}
+            {products.length === 0 ? (
+              <div className="p-12 text-center bg-white rounded-3xl border border-pink-200 my-8 shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-pink-100 text-[#64263C] flex items-center justify-center mx-auto mb-4 text-3xl">
+                  💅🏻
+                </div>
+                <h3 className="font-serif font-bold text-2xl text-[#64263C] mb-2">
+                  New Nail Collections Arriving Soon
+                </h3>
+                <p className="text-xs sm:text-sm text-[#5A5255] max-w-md mx-auto mb-6 leading-relaxed">
+                  Our nail artists are handcrafting the next drop of bespoke press-on designs. Need a personalized set right now? Connect directly with our personal stylist concierge!
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    onClick={() => {
+                      setSelectedCollection("All");
+                      setSelectedShape("All");
+                      setSelectedLength("All");
+                      setSearchQuery("");
+                    }}
+                    className="btn-secondary text-xs py-2.5 px-6 shadow-sm"
+                  >
+                    View All Styles
+                  </button>
+                  <a
+                    href="https://wa.me/918178187385?text=Hi%20Games%20of%20Gloss!%20%F0%9F%92%85%F0%9F%8F%BB%20I'd%20like%20to%20inquire%20about%20a%20custom%20press-on%20set."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary text-xs py-2.5 px-6 shadow-sm flex items-center gap-1.5"
+                  >
+                    <span>WhatsApp Concierge 💅🏻</span>
+                  </a>
+                </div>
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredProducts.map((product) => (
                   <ProductCard
@@ -423,8 +465,8 @@ export const ShopPage = ({
                 ))}
               </div>
             ) : (
-              /* Empty State */
-              <div className="p-12 text-center bg-white rounded-3xl border border-pink-200 my-8">
+              /* Filter Mismatch Empty State */
+              <div className="p-12 text-center bg-white rounded-3xl border border-pink-200 my-8 shadow-sm">
                 <div className="w-16 h-16 rounded-full bg-pink-100 text-3xl flex items-center justify-center mx-auto mb-4">
                   🔍
                 </div>
