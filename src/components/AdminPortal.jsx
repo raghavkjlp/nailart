@@ -1224,7 +1224,7 @@ export const AdminPortal = ({
                           Selling Price (₹) *
                         </label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-[#64263C]">₹</span>
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-[#64263C] pointer-events-none select-none">₹</span>
                           <input
                             type="number"
                             required
@@ -1242,7 +1242,7 @@ export const AdminPortal = ({
                           Original Price / MRP (₹)
                         </label>
                         <div className="relative">
-                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
+                          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none select-none">₹</span>
                           <input
                             type="number"
                             min="0"
