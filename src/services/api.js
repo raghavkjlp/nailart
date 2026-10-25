@@ -6,6 +6,9 @@
 const TOKEN_KEY = "gog_admin_jwt";
 const ADMIN_KEY = "gog_admin_user";
 
+// Configurable API Base (supports Render deployed backend URL via VITE_API_URL)
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
 /**
  * Authentication Helpers
  */
@@ -50,7 +53,7 @@ export const getAuthHeaders = () => {
  */
 export const adminLogin = async (username, password) => {
   try {
-    const res = await fetch("/api/admin/login", {
+    const res = await fetch(`${API_BASE}/api/admin/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
@@ -72,7 +75,7 @@ export const adminLogin = async (username, password) => {
  */
 export const adminLogout = async () => {
   try {
-    await fetch("/api/admin/logout", {
+    await fetch(`${API_BASE}/api/admin/logout`, {
       method: "POST",
       headers: { ...getAuthHeaders() }
     });
@@ -89,7 +92,7 @@ export const adminLogout = async () => {
  */
 export const fetchProductsFromDb = async () => {
   try {
-    const res = await fetch("/api/products");
+    const res = await fetch(`${API_BASE}/api/products`);
     if (!res.ok) throw new Error("Failed to fetch products from backend");
     const data = await res.json();
     return data.products || [];
@@ -112,7 +115,7 @@ export const uploadImagesToImageKit = async (files) => {
     formData.append("images", file);
   }
 
-  const res = await fetch("/api/upload", {
+  const res = await fetch(`${API_BASE}/api/upload`, {
     method: "POST",
     headers: {
       ...getAuthHeaders()
@@ -133,7 +136,7 @@ export const uploadImagesToImageKit = async (files) => {
  * POST /api/products
  */
 export const createProductInDb = async (productData) => {
-  const res = await fetch("/api/products", {
+  const res = await fetch(`${API_BASE}/api/products`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -155,7 +158,7 @@ export const createProductInDb = async (productData) => {
  * PUT /api/products/:id
  */
 export const updateProductInDb = async (id, productData) => {
-  const res = await fetch(`/api/products/${id}`, {
+  const res = await fetch(`${API_BASE}/api/products/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -177,7 +180,7 @@ export const updateProductInDb = async (id, productData) => {
  * DELETE /api/products/:id
  */
 export const deleteProductFromDb = async (id) => {
-  const res = await fetch(`/api/products/${id}`, {
+  const res = await fetch(`${API_BASE}/api/products/${id}`, {
     method: "DELETE",
     headers: {
       ...getAuthHeaders()
@@ -197,7 +200,7 @@ export const deleteProductFromDb = async (id) => {
  * DELETE /api/products/admin/clear-all
  */
 export const clearAllProductsFromDb = async () => {
-  const res = await fetch("/api/products/admin/clear-all", {
+  const res = await fetch(`${API_BASE}/api/products/admin/clear-all`, {
     method: "DELETE",
     headers: {
       ...getAuthHeaders()
@@ -217,7 +220,7 @@ export const clearAllProductsFromDb = async () => {
  * POST /api/products/admin/seed-demo
  */
 export const seedDemoProductInDb = async () => {
-  const res = await fetch("/api/products/admin/seed-demo", {
+  const res = await fetch(`${API_BASE}/api/products/admin/seed-demo`, {
     method: "POST",
     headers: {
       ...getAuthHeaders()
