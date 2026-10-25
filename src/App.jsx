@@ -16,6 +16,10 @@ import { SizingGuideModal } from "./components/SizingGuideModal.jsx";
 import { CustomOrderModal } from "./components/CustomOrderModal.jsx";
 import { CartDrawer } from "./components/CartDrawer.jsx";
 import { AdminPortal } from "./components/AdminPortal.jsx";
+import { SpinWheelModal } from "./components/SpinWheelModal.jsx";
+import { SpinLauncherBadge } from "./components/SpinLauncherBadge.jsx";
+import { JewelleryPage } from "./components/JewelleryPage.jsx";
+import { JewelleryDetailModal } from "./components/JewelleryDetailModal.jsx";
 import { getStoredProducts, subscribeProducts, syncProductsWithDb } from "./data/productStore.js";
 import { Sparkles, X, CheckCircle, Heart, ArrowUp } from "lucide-react";
 
@@ -42,7 +46,32 @@ export function App() {
   const [sizingModalOpen, setSizingModalOpen] = useState(false);
   const [customOrderModalOpen, setCustomOrderModalOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+  const [quickViewJewellery, setQuickViewJewellery] = useState(null);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+
+  // Spin Wheel Gate: Automatically shown to every visitor and cannot be closed until spin result comes
+  const [spinModalOpen, setSpinModalOpen] = useState(() => {
+    try {
+      if (typeof window !== "undefined" && window.location.hash === "#admin") {
+        return false;
+      }
+      return !sessionStorage.getItem("gog_spin_completed");
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (window.location.hash === "#admin") return;
+      const completed = sessionStorage.getItem("gog_spin_completed");
+      if (!completed) {
+        setSpinModalOpen(true);
+      }
+    } catch {
+      setSpinModalOpen(true);
+    }
+  }, [activeTab]);
 
   // Shop filter preselection (e.g. when clicking featured collection)
   const [shopCategoryFilter, setShopCategoryFilter] = useState("All");
@@ -278,6 +307,15 @@ export function App() {
           />
         )}
 
+        {activeTab === "jewellery" && (
+          <JewelleryPage
+            onQuickView={(item) => setQuickViewJewellery(item)}
+            onAddToCart={handleAddToCart}
+            wishlist={wishlist}
+            onToggleWishlist={handleToggleWishlist}
+          />
+        )}
+
         {activeTab === "about" && (
           <AboutSection
             setActiveTab={handleTabChange}
@@ -394,6 +432,36 @@ export function App() {
           window.scrollTo({ top: 0, behavior: "smooth" });
         }}
       />
+
+      {/* 6. Jewellery Quick View / Detail Modal */}
+      {quickViewJewellery && (
+        <JewelleryDetailModal
+          product={quickViewJewellery}
+          onClose={() => setQuickViewJewellery(null)}
+          onAddToCart={handleAddToCart}
+          wishlist={wishlist}
+          onToggleWishlist={handleToggleWishlist}
+        />
+      )}
+
+      {/* 7. Spin the Wheel Promotional Entry Popup */}
+      <SpinWheelModal
+        isOpen={spinModalOpen}
+        onClose={() => setSpinModalOpen(false)}
+        onExploreShop={() => {
+          setSpinModalOpen(false);
+          handleTabChange("shop");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+        onExploreJewellery={() => {
+          setSpinModalOpen(false);
+          handleTabChange("jewellery");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }}
+      />
+
+      {/* 8. Floating Spin to Win Trigger Badge (Bottom-Left) */}
+      <SpinLauncherBadge onClick={() => setSpinModalOpen(true)} />
     </div>
   );
 }

@@ -6,11 +6,25 @@
 const TOKEN_KEY = "gog_admin_jwt";
 const ADMIN_KEY = "gog_admin_user";
 
-// Configurable API Base (defaults to deployed Render backend)
-const API_BASE = (
-  import.meta.env.VITE_API_URL ||
-  "https://nailart-z8gc.onrender.com"
-).replace(/\/$/, "");
+// Configurable API Base with smart local detection
+export const getApiBase = () => {
+  if (typeof window !== "undefined") {
+    const isLocal =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    if (isLocal) {
+      if (import.meta.env.VITE_API_URL && !import.meta.env.VITE_API_URL.includes("onrender.com")) {
+        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+      }
+      return "http://localhost:5000";
+    }
+  }
+  return (
+    import.meta.env.VITE_API_URL || "https://nailart-z8gc.onrender.com"
+  ).replace(/\/$/, "");
+};
+
+export const API_BASE = getApiBase();
 
 /**
  * Authentication Helpers
@@ -237,3 +251,232 @@ export const seedDemoProductInDb = async () => {
 
   return data.product;
 };
+
+// ============================================================================
+// SPIN THE WHEEL LEADS API
+// ============================================================================
+
+/**
+ * Public: Submit visitor contact info and record spin lead
+ * POST /api/spin-leads
+ */
+export const submitSpinLead = async ({ fullName, phoneNumber, email, consent = true }) => {
+  const res = await fetch(`${API_BASE}/api/spin-leads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ fullName, phoneNumber, email, consent })
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to submit spin entry");
+  }
+
+  return data;
+};
+
+/**
+ * Admin: Fetch spin leads with pagination, search & sorting
+ * GET /api/admin/spin-leads
+ */
+export const fetchSpinLeadsAdmin = async ({
+  page = 1,
+  limit = 20,
+  search = "",
+  sortBy = "createdAt",
+  sortOrder = "desc"
+} = {}) => {
+  const query = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    search,
+    sortBy,
+    sortOrder
+  });
+
+  const res = await fetch(`${API_BASE}/api/admin/spin-leads?${query.toString()}`, {
+    headers: {
+      ...getAuthHeaders()
+    }
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to fetch spin leads from server");
+  }
+
+  return data;
+};
+
+/**
+ * Admin: Export spin leads as CSV
+ */
+export const exportSpinLeadsCsv = async () => {
+  const res = await fetch(`${API_BASE}/api/admin/spin-leads/export`, {
+    headers: {
+      ...getAuthHeaders()
+    }
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to export spin leads CSV");
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `games-of-gloss-spin-leads-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(url);
+  return true;
+};
+
+/**
+ * Admin: Delete a single lead
+ */
+export const deleteSpinLeadAdmin = async (id) => {
+  const res = await fetch(`${API_BASE}/api/admin/spin-leads/${id}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders()
+    }
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to delete lead");
+  }
+
+  return true;
+};
+
+// ============================================================================
+// JEWELLERY ATELIER API
+// ============================================================================
+
+/**
+ * Public: Fetch active jewellery products from database
+ * GET /api/jewellery
+ */
+export const fetchJewelleryFromDb = async ({ category = "All", search = "", availableOnly = false } = {}) => {
+  const params = new URLSearchParams();
+  if (category && category !== "All" && category !== "All Pieces") {
+    params.set("category", category);
+  }
+  if (search) {
+    params.set("search", search);
+  }
+  if (availableOnly) {
+    params.set("availableOnly", "true");
+  }
+
+  const queryStr = params.toString() ? `?${params.toString()}` : "";
+  const res = await fetch(`${API_BASE}/api/jewellery${queryStr}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch jewellery products from backend");
+  }
+
+  const data = await res.json();
+  return data.products || [];
+};
+
+/**
+ * Public: Get single jewellery piece
+ * GET /api/jewellery/:id
+ */
+export const fetchSingleJewelleryFromDb = async (id) => {
+  const res = await fetch(`${API_BASE}/api/jewellery/${id}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch jewellery product details");
+  }
+  const data = await res.json();
+  return data.product;
+};
+
+/**
+ * Admin: Create jewellery product
+ * POST /api/admin/jewellery
+ */
+export const createJewelleryInDb = async (productData) => {
+  const res = await fetch(`${API_BASE}/api/admin/jewellery`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify(productData)
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to save jewellery piece");
+  }
+
+  return data.product;
+};
+
+/**
+ * Admin: Update jewellery product
+ * PUT /api/admin/jewellery/:id
+ */
+export const updateJewelleryInDb = async (id, productData) => {
+  const res = await fetch(`${API_BASE}/api/admin/jewellery/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getAuthHeaders()
+    },
+    body: JSON.stringify(productData)
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to update jewellery piece");
+  }
+
+  return data.product;
+};
+
+/**
+ * Admin: Delete jewellery product
+ * DELETE /api/admin/jewellery/:id
+ */
+export const deleteJewelleryFromDb = async (id) => {
+  const res = await fetch(`${API_BASE}/api/admin/jewellery/${id}`, {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeaders()
+    }
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to delete jewellery piece");
+  }
+
+  return true;
+};
+
+/**
+ * Admin: Seed jewellery collection
+ * POST /api/admin/jewellery/seed
+ */
+export const seedJewelleryInDb = async (force = false) => {
+  const res = await fetch(`${API_BASE}/api/admin/jewellery/seed${force ? "?force=true" : ""}`, {
+    method: "POST",
+    headers: {
+      ...getAuthHeaders()
+    }
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to seed jewellery collection");
+  }
+
+  return data;
+};
+

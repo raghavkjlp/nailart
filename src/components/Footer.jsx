@@ -100,12 +100,12 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
               <li>
                 <button
                   onClick={() => {
-                    setActiveTab("shop");
+                    setActiveTab("jewellery");
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   className="hover:text-[#F3B6CB] transition-colors"
                 >
-                  Shop Jewellery
+                  Shop Jewellery ✨
                 </button>
               </li>
               <li>

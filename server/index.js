@@ -5,7 +5,11 @@ import cors from "cors";
 import authRoutes from "./routes/auth.js";
 import productRoutes from "./routes/products.js";
 import uploadRoutes from "./routes/upload.js";
+import spinLeadRoutes from "./routes/spinLeads.js";
+import jewelleryRoutes from "./routes/jewellery.js";
 import Product from "./models/Product.js";
+import JewelleryProduct from "./models/JewelleryProduct.js";
+import { DEFAULT_JEWELLERY_PRODUCTS } from "./data/defaultJewellery.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -21,6 +25,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/spin-leads", spinLeadRoutes);
+app.use("/api/admin/spin-leads", spinLeadRoutes);
+app.use("/api/jewellery", jewelleryRoutes);
+app.use("/api/admin/jewellery", jewelleryRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -71,6 +79,13 @@ async function seedDefaultIfEmpty() {
           "10 Handcrafted Press-On Nails, Professional Nail Glue, Double-Sided Adhesive Tabs, Nail Buffer, Nail Filer, Cuticle Pusher & Alcohol Prep pad(s). Reusable up to 5x with included jelly adhesive tabs"
       });
       console.log("Coquette Affair seeded into MongoDB Atlas successfully!");
+    }
+
+    const jewelleryCount = await JewelleryProduct.countDocuments();
+    if (jewelleryCount === 0) {
+      console.log("No jewellery products in MongoDB. Seeding initial jewellery collection across all 5 categories...");
+      await JewelleryProduct.insertMany(DEFAULT_JEWELLERY_PRODUCTS);
+      console.log(`Seeded ${DEFAULT_JEWELLERY_PRODUCTS.length} jewellery pieces into MongoDB Atlas successfully!`);
     }
   } catch (err) {
     console.error("Error checking or seeding database:", err);

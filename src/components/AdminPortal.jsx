@@ -52,6 +52,8 @@ import {
   getAdminUser,
   uploadImagesToImageKit
 } from "../services/api.js";
+import { AdminSpinLeads } from "./admin/AdminSpinLeads.jsx";
+import { AdminJewelleryManager } from "./admin/AdminJewelleryManager.jsx";
 
 export const AdminPortal = ({
   products = [],
@@ -65,6 +67,9 @@ export const AdminPortal = ({
   const [loginPassword, setLoginPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+
+  // Primary Section Hub: 'nails' | 'jewellery' | 'leads'
+  const [adminSection, setAdminSection] = useState("nails");
 
   // UI States
   const [modalOpen, setModalOpen] = useState(false);
@@ -588,21 +593,103 @@ export const AdminPortal = ({
           </div>
         )}
 
-        {/* Top Header Strip: Sign Out Only */}
-        <div className="mb-5 flex items-center justify-end">
+        {/* Admin Master Navigation Hub */}
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 bg-white p-3.5 sm:p-4 rounded-3xl border border-pink-200 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setAdminSection("nails")}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+                adminSection === "nails"
+                  ? "bg-[#64263C] text-white shadow-md scale-102"
+                  : "bg-[#FFF9F5] text-[#5A5255] border border-pink-200 hover:bg-pink-100"
+              }`}
+            >
+              <span>💅 Press-On Nails</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  adminSection === "nails"
+                    ? "bg-white/20 text-[#D6B477]"
+                    : "bg-pink-100 text-[#64263C]"
+                }`}
+              >
+                {products.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setAdminSection("jewellery")}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+                adminSection === "jewellery"
+                  ? "bg-[#64263C] text-white shadow-md scale-102"
+                  : "bg-[#FFF9F5] text-[#5A5255] border border-pink-200 hover:bg-pink-100"
+              }`}
+            >
+              <span>💍 Jewellery Catalog</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  adminSection === "jewellery"
+                    ? "bg-white/20 text-[#D6B477]"
+                    : "bg-pink-100 text-[#64263C]"
+                }`}
+              >
+                5 Categories
+              </span>
+            </button>
+
+            <button
+              onClick={() => setAdminSection("leads")}
+              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+                adminSection === "leads"
+                  ? "bg-[#64263C] text-white shadow-md scale-102"
+                  : "bg-[#FFF9F5] text-[#5A5255] border border-pink-200 hover:bg-pink-100"
+              }`}
+            >
+              <span>🎡 Spin Wheel Leads</span>
+              <span
+                className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                  adminSection === "leads"
+                    ? "bg-white/20 text-[#D6B477]"
+                    : "bg-pink-100 text-[#64263C]"
+                }`}
+              >
+                Live DB
+              </span>
+            </button>
+          </div>
+
           <button
             onClick={handleLogout}
-            className="text-xs font-bold text-rose-700 hover:text-rose-900 flex items-center gap-1.5 bg-white px-4 py-2 rounded-full border border-rose-200 shadow-sm hover:bg-rose-50 hover:shadow transition-all"
+            className="text-xs font-bold text-rose-700 hover:text-rose-900 flex items-center gap-1.5 bg-rose-50/80 hover:bg-rose-100 px-4 py-2 rounded-full border border-rose-200 shadow-sm transition-all ml-auto"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>Sign Out</span>
           </button>
         </div>
 
-        {/* Admin Header & Stats */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-sm mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-pink-100">
-            <div>
+        {/* SECTION 1: JEWELLERY CATALOG MANAGEMENT */}
+        {adminSection === "jewellery" && (
+          <AdminJewelleryManager
+            notify={notify}
+            onSwitchToJewelleryStore={() => {
+              window.location.hash = "";
+              window.location.search = "";
+              window.location.pathname = "/";
+            }}
+          />
+        )}
+
+        {/* SECTION 2: SPIN WHEEL LEADS MANAGEMENT */}
+        {adminSection === "leads" && (
+          <AdminSpinLeads notify={notify} />
+        )}
+
+        {/* SECTION 3: PRESS-ON NAIL CATALOG MANAGEMENT */}
+        {adminSection === "nails" && (
+          <>
+            {/* Admin Header & Stats */}
+            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-pink-200 shadow-sm mb-8">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-pink-100">
+                <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 text-[#64263C] text-[11px] font-bold uppercase tracking-wider mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-[#D6B477]" />
                 Atelier Admin Portal
@@ -946,6 +1033,8 @@ export const AdminPortal = ({
               );
             })}
           </div>
+        )}
+          </>
         )}
       </div>
 

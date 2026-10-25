@@ -109,7 +109,9 @@ export const CartDrawer = ({
                   </div>
 
                   <div className="text-[11px] text-[#5A5255] mb-2">
-                    {item.selectedShape || item.shape} • {item.selectedLength || item.defaultLength} • Size: {item.selectedSize || "M"}
+                    {item.type === "jewellery" || (!item.selectedShape && !item.shape)
+                      ? `${item.category || "Jewellery"} • ${item.material || "Free Size"}`
+                      : `${item.selectedShape || item.shape || "Almond"} • ${item.selectedLength || item.defaultLength || "Medium"} • Size: ${item.selectedSize || "M"}`}
                   </div>
 
                   <div className="flex items-center justify-between">

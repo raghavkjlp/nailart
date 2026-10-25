@@ -110,6 +110,7 @@ export const Navbar = ({
   const navItems = [
     { id: "home", label: "Home" },
     { id: "shop", label: "Shop Nail Sets" },
+    { id: "jewellery", label: "Jewellery ✨" },
     { id: "sizing", label: "Sizing Guide" },
     { id: "about", label: "About Us" },
     { id: "contact", label: "Contact" }
