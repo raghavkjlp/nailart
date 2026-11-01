@@ -68,7 +68,8 @@ export const AdminJewelleryManager = ({ notify, onSwitchToJewelleryStore }) => {
   const [formData, setFormData] = useState(DEFAULT_FORM_DATA);
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [deleteTargetPiece, setDeleteTargetPiece] = useState(null);
+  const [isDeletingPiece, setIsDeletingPiece] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [customImageUrl, setCustomImageUrl] = useState("");
@@ -157,14 +158,20 @@ export const AdminJewelleryManager = ({ notify, onSwitchToJewelleryStore }) => {
   };
 
   // Delete product
-  const handleDelete = async (id) => {
+  const handleDelete = async (target) => {
+    const id = typeof target === "string" ? target : (target?.id || target?.customId || target?._id);
+    if (!id) return;
+    setIsDeletingPiece(true);
     try {
       await deleteJewelleryFromDb(id);
-      setDeleteConfirmId(null);
-      if (notify) notify("Jewellery piece deleted from MongoDB Atlas");
+      setDeleteTargetPiece(null);
+      setProducts((prev) => prev.filter((p) => (p.id || p.customId || p._id) !== id));
+      if (notify) notify("Jewellery piece deleted from MongoDB Atlas! 🗑️");
       loadJewellery();
     } catch (err) {
       if (notify) notify("Failed to delete piece: " + err.message, "error");
+    } finally {
+      setIsDeletingPiece(false);
     }
   };
 
@@ -527,30 +534,13 @@ export const AdminJewelleryManager = ({ notify, onSwitchToJewelleryStore }) => {
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
 
-                          {deleteConfirmId === itemId ? (
-                            <div className="flex items-center gap-1">
-                              <button
-                                onClick={() => handleDelete(itemId)}
-                                className="px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold"
-                              >
-                                Delete
-                              </button>
-                              <button
-                                onClick={() => setDeleteConfirmId(null)}
-                                className="px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-[10px]"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setDeleteConfirmId(itemId)}
-                              className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                              title="Delete Piece"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => setDeleteTargetPiece(item)}
+                            className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition-colors"
+                            title="Delete Piece"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -843,6 +833,52 @@ export const AdminJewelleryManager = ({ notify, onSwitchToJewelleryStore }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* Prominent Piece Deletion Confirmation Modal */}
+      {deleteTargetPiece && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl border border-pink-200 text-center animate-scale-up">
+            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <h3 className="font-serif font-bold text-lg text-[#64263C] mb-1">
+              Delete Jewellery Piece?
+            </h3>
+            <p className="text-xs text-[#5A5255] mb-4">
+              Are you sure you want to delete <strong className="text-[#242124]">{deleteTargetPiece.name}</strong> from MongoDB Atlas?
+              This piece will no longer be visible in the store.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                disabled={isDeletingPiece}
+                onClick={() => setDeleteTargetPiece(null)}
+                className="flex-1 py-2.5 rounded-full border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingPiece}
+                onClick={() => handleDelete(deleteTargetPiece)}
+                className="flex-1 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#e11d48', color: 'white' }}
+              >
+                {isDeletingPiece ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1298,6 +1298,7 @@ export const AdminPortal = ({
                         >
                           <option value="Coquette & Cute 🎀">Coquette & Cute 🎀</option>
                           <option value="Clean Girl Era 🤍">Clean Girl Era 🤍</option>
+                          <option value="Cat Eye Collection 🔮">Cat Eye Collection 🔮</option>
                           <option value="Baddie Energy 🖤">Baddie Energy 🖤</option>
                           <option value="Wedding & Romance 💍">Wedding & Romance 💍</option>
                           <option value="Chrome & Glazed ✨">Chrome & Glazed ✨</option>
@@ -1797,9 +1798,10 @@ export const AdminPortal = ({
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirmId)}
-                className="py-2.5 rounded-full bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold shadow-md"
+                className="py-2.5 rounded-full bg-rose-700 hover:bg-rose-800 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5"
               >
-                Delete from DB
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete from DB</span>
               </button>
             </div>
           </div>

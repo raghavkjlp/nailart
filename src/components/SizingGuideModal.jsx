@@ -52,6 +52,19 @@ export const SizingGuideModal = ({ onClose }) => {
             </p>
           </div>
 
+          {/* Important Note About Nail Sizes */}
+          <div className="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-[#5A5255]">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-amber-800 block mb-1">Important Sizing Note:</strong>
+                <p className="leading-relaxed">
+                  The sizes mentioned in our standard chart are approximate and may vary depending on the length of your nails. For the most accurate fit, we strongly advise customers to provide their custom nail sizes. You can use our free WhatsApp sizing service or tape & ruler method for precise measurements.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Sizing Standard Table */}
           <div className="mb-6 overflow-hidden rounded-2xl border border-pink-200 bg-white shadow-sm">
             <div className="bg-pink-100/70 px-4 py-2.5 text-xs font-bold text-[#64263C] flex items-center justify-between">

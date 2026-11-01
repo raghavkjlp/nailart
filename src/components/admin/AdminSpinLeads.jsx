@@ -7,7 +7,6 @@ import {
   RefreshCw,
   Phone,
   Mail,
-  User,
   Calendar,
   AlertCircle,
   ChevronLeft,
@@ -33,7 +32,8 @@ export const AdminSpinLeads = ({ notify }) => {
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState("desc"); // 'desc' (newest) | 'asc' (oldest)
   const [isExporting, setIsExporting] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+  const [deleteTargetLead, setDeleteTargetLead] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
 
   const loadLeads = async () => {
@@ -88,14 +88,23 @@ export const AdminSpinLeads = ({ notify }) => {
   };
 
   // Delete lead handler
-  const handleDelete = async (id) => {
+  const handleDelete = async (target) => {
+    const leadId = typeof target === "string" ? target : (target?.id || target?._id);
+    if (!leadId) return;
+
+    setIsDeleting(true);
     try {
-      await deleteSpinLeadAdmin(id);
-      setDeleteConfirmId(null);
-      if (notify) notify("Lead deleted successfully");
+      await deleteSpinLeadAdmin(leadId);
+      setDeleteTargetLead(null);
+      // Instant optimistic state update
+      setLeads((prev) => prev.filter((l) => (l.id || l._id) !== leadId));
+      setTotalCount((prev) => Math.max(0, prev - 1));
+      if (notify) notify("Lead record deleted successfully from database! 🗑️");
       loadLeads();
     } catch (err) {
       if (notify) notify("Failed to delete lead: " + err.message, "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -322,7 +331,6 @@ export const AdminSpinLeads = ({ notify }) => {
               ) : (
                 leads.map((lead, idx) => {
                   const itemIndex = (page - 1) * limit + idx + 1;
-                  const isCopied = copiedId === lead.id;
 
                   return (
                     <tr
@@ -412,30 +420,13 @@ export const AdminSpinLeads = ({ notify }) => {
 
                       {/* Actions */}
                       <td className="py-4 px-4 sm:px-6 text-right whitespace-nowrap">
-                        {deleteConfirmId === lead.id ? (
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button
-                              onClick={() => handleDelete(lead.id)}
-                              className="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-[10px] font-bold hover:bg-rose-700"
-                            >
-                              Confirm
-                            </button>
-                            <button
-                              onClick={() => setDeleteConfirmId(null)}
-                              className="px-2.5 py-1 rounded-lg bg-gray-200 text-gray-700 text-[10px] font-bold hover:bg-gray-300"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setDeleteConfirmId(lead.id)}
-                            className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                            title="Delete Lead"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => setDeleteTargetLead(lead)}
+                          className="p-1.5 rounded-xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 transition-colors inline-flex items-center justify-center"
+                          title="Delete Lead"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </td>
                     </tr>
                   );
@@ -496,6 +487,55 @@ export const AdminSpinLeads = ({ notify }) => {
           </div>
         )}
       </div>
+
+      {/* Prominent Lead Deletion Confirmation Modal */}
+      {deleteTargetLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-sm w-full shadow-2xl border border-pink-200 text-center animate-scale-up">
+            <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <h3 className="font-serif font-bold text-lg text-[#64263C] mb-1">
+              Delete Lead Record?
+            </h3>
+            <p className="text-xs text-[#5A5255] mb-4">
+              Are you sure you want to delete the entry for{" "}
+              <strong className="text-[#242124]">{deleteTargetLead.email}</strong>
+              {deleteTargetLead.fullName && deleteTargetLead.fullName !== "—" ? ` (${deleteTargetLead.fullName})` : ""}?
+              This action cannot be undone.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => setDeleteTargetLead(null)}
+                className="flex-1 py-2.5 rounded-full border border-gray-300 text-xs font-bold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => handleDelete(deleteTargetLead)}
+                className="flex-1 py-2.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ backgroundColor: '#e11d48', color: 'white' }}
+              >
+                {isDeleting ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
