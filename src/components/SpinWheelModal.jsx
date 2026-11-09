@@ -126,8 +126,8 @@ export const SpinWheelModal = ({
   const [isSpinning, setIsSpinning] = useState(false);
 
   const handleClose = useCallback(() => {
-    // Allow closing if result has been revealed or returning user has already spun
-    if (step !== "result" && !hasAlreadySpun) {
+    // Only block closing while the wheel is actively spinning
+    if (isSpinning) {
       return;
     }
     try {
@@ -137,13 +137,13 @@ export const SpinWheelModal = ({
       // Ignore
     }
     onClose();
-  }, [step, hasAlreadySpun, onClose]);
+  }, [isSpinning, onClose]);
 
-  // Allow closing via Escape key if already spun or result reached
+  // Allow closing via Escape key anytime unless wheel is actively spinning
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        if (step === "result" || hasAlreadySpun) {
+        if (!isSpinning) {
           handleClose();
         } else {
           e.preventDefault();
@@ -152,7 +152,7 @@ export const SpinWheelModal = ({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [step, hasAlreadySpun, handleClose]);
+  }, [isSpinning, handleClose]);
 
   // Canvas ref for drawing the crisp high-DPI wheel
   const canvasRef = useRef(null);
@@ -395,7 +395,7 @@ export const SpinWheelModal = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
       onClick={() => {
-        if (step === "result" || hasAlreadySpun) {
+        if (!isSpinning) {
           handleClose();
         }
       }}
@@ -408,8 +408,8 @@ export const SpinWheelModal = ({
         {/* Decorative Top Accent Bar */}
         <div className="h-2 w-full bg-gradient-to-r from-[#64263C] via-[#D6B477] to-[#64263C]" />
 
-        {/* Close Button - VISIBLE ONCE SPIN RESULT IS REVEALED OR RETURNING USER HAS ALREADY SPUN */}
-        {(step === "result" || hasAlreadySpun) && (
+        {/* Close Button - Always visible for first-time & returning visitors (hidden only while wheel is actively spinning) */}
+        {!isSpinning && (
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/90 hover:bg-pink-100 text-[#64263C] border border-pink-200 transition-all shadow-md"
