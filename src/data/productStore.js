@@ -56,7 +56,47 @@ export const COQUETTE_AFFAIR_TEMPLATE = {
   }
 };
 
-export const INITIAL_PRODUCTS = [COQUETTE_AFFAIR_TEMPLATE];
+/**
+ * Cat Eye Collection Signature Template: "Velvet Cat Eye Aura"
+ */
+export const VELVET_CATEYE_TEMPLATE = {
+  id: "velvet-cateye-aura",
+  name: "Velvet Cat Eye Aura",
+  price: 799,
+  originalPrice: 1199,
+  image: "/images/velvetnoir_nail.jpg",
+  gallery: [
+    "/images/velvetnoir_nail.jpg"
+  ],
+  badge: "New Release 🔮",
+  rating: 5.0,
+  reviewCount: 48,
+  collection: "Cat Eye Collection 🔮",
+  aestheticTags: ["Cat Eye Collection", "Velvet Shimmer", "Magnetic Aura"],
+  shape: "Almond",
+  availableShapes: ["Almond", "Square", "Coffin / Ballerina", "Oval", "Stiletto"],
+  availableLengths: ["Short", "Medium", "Long", "Extra Long"],
+  defaultLength: "Medium",
+  availableSizes: ["XS", "S", "M", "L", "Custom"],
+  defaultSize: "M",
+  colors: ["Black and burgundy", "Chrome and silver"],
+  occasions: ["Party or vacation", "Date night", "Everyday wear"],
+  personalityTags: ["Expensive and luxurious", "Mysterious and bold"],
+  finish: "Magnetic Velvet Cat-Eye",
+  shortDescription: "Multidimensional magnetic shimmer that creates an ethereal shifting light halo on smoky velvet plum.",
+  longDescription:
+    "Sculpted with premium Japanese magnetic pigments, Velvet Cat Eye Aura shifts dynamically under every angle of lighting. Creates an ultra-deep, velvety optical illusion that turns ordinary nails into precious gemstones.",
+  isAvailable: true,
+  inclusions:
+    "10 Handcrafted Press-On Nails, Professional Nail Glue, Double-Sided Adhesive Tabs, Nail Buffer, Nail Filer, Cuticle Pusher & Alcohol Prep pad(s). Reusable up to 5x with included jelly adhesive tabs",
+  careTabs: {
+    prep: "Push cuticles back gently & buff natural nail shine with mini buffer. Wipe each nail thoroughly with the alcohol prep pad to dehydrate oils.",
+    removal: "Soak hands in warm soapy water with a few drops of cuticle oil for 10-15 minutes. Gently lift edges with the wooden cuticle stick. Never force or pull violently.",
+    glueVsTabs: "Use Jelly Adhesive Tabs for temporary 3–7 day wear (completely damage-free & nails are 100% reusable). Use Professional Nail Glue for 2–3 week salon-strength wear."
+  }
+};
+
+export const INITIAL_PRODUCTS = [COQUETTE_AFFAIR_TEMPLATE, VELVET_CATEYE_TEMPLATE];
 
 /**
  * Retrieve all products from localStorage cache
@@ -69,7 +109,21 @@ export const getStoredProducts = () => {
       return INITIAL_PRODUCTS;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : INITIAL_PRODUCTS;
+    if (Array.isArray(parsed)) {
+      const hasCatEye = parsed.some(
+        (p) => p.id === "velvet-cateye-aura" || p.collection?.includes("Cat Eye")
+      );
+      if (!hasCatEye && parsed.length > 0) {
+        parsed.push(VELVET_CATEYE_TEMPLATE);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        } catch {
+          // Ignore quota error
+        }
+      }
+      return parsed;
+    }
+    return INITIAL_PRODUCTS;
   } catch (err) {
     console.error("Failed to read products from localStorage:", err);
     return INITIAL_PRODUCTS;

@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Sparkles,
   X,
   Phone,
   Mail,
   User,
-  CheckCircle,
   AlertCircle,
-  Gift,
-  ArrowRight,
   ShieldCheck,
   RotateCw
 } from "lucide-react";
-import { submitSpinLead } from "../services/api.js";
+import { submitSpinLead, checkSpinEligibility } from "../services/api.js";
 
 // 8 Engaging Visual Segments on the Wheel
 // Segment 0 is "Better Luck Next Time!" (The mandatory winning result)
@@ -89,29 +86,64 @@ export const SpinWheelModal = ({
   onExploreShop,
   onExploreJewellery
 }) => {
-  // Step: 'form' | 'spinning' | 'result' (Modal cannot be closed until 'result' comes)
+  // Step: 'form' | 'spinning' | 'result'
   const [step, setStep] = useState("form");
 
   // Form Fields
   const [fullName, setFullName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(() => {
+    try {
+      return localStorage.getItem("gog_spun_email") || "";
+    } catch {
+      return "";
+    }
+  });
   const [consent, setConsent] = useState(true);
 
   // Form Status & Validation Errors
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState("");
+  const [apiError, setApiError] = useState(() => {
+    try {
+      return localStorage.getItem("gog_user_spun") === "true"
+        ? "You have already spun the wheel!"
+        : "";
+    } catch {
+      return "";
+    }
+  });
+  const [hasAlreadySpun, setHasAlreadySpun] = useState(() => {
+    try {
+      return localStorage.getItem("gog_user_spun") === "true";
+    } catch {
+      return false;
+    }
+  });
 
   // Wheel Animation Rotation
   const [rotationAngle, setRotationAngle] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
 
-  // Prevent closing via Escape key unless result has arrived
+  const handleClose = useCallback(() => {
+    // Allow closing if result has been revealed or returning user has already spun
+    if (step !== "result" && !hasAlreadySpun) {
+      return;
+    }
+    try {
+      sessionStorage.setItem("gog_spin_completed", "true");
+      sessionStorage.setItem("gog_spin_shown", "true");
+    } catch {
+      // Ignore
+    }
+    onClose();
+  }, [step, hasAlreadySpun, onClose]);
+
+  // Allow closing via Escape key if already spun or result reached
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Escape") {
-        if (step === "result") {
+        if (step === "result" || hasAlreadySpun) {
           handleClose();
         } else {
           e.preventDefault();
@@ -120,7 +152,7 @@ export const SpinWheelModal = ({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [step]);
+  }, [step, hasAlreadySpun, handleClose]);
 
   // Canvas ref for drawing the crisp high-DPI wheel
   const canvasRef = useRef(null);
@@ -263,7 +295,21 @@ export const SpinWheelModal = ({
     setIsSubmitting(true);
 
     try {
-      // Save lead to database BEFORE spinning
+      // Pre-spin Database Check: Verify if email has already spun the wheel
+      const checkRes = await checkSpinEligibility(email.trim().toLowerCase());
+      if (checkRes && checkRes.alreadySpun) {
+        setHasAlreadySpun(true);
+        setApiError("You have already spun the wheel!");
+        setIsSubmitting(false);
+        try {
+          localStorage.setItem("gog_user_spun", "true");
+          localStorage.setItem("gog_spun_email", email.trim().toLowerCase());
+          sessionStorage.setItem("gog_spin_completed", "true");
+        } catch {}
+        return;
+      }
+
+      // Save lead to database BEFORE spinning (backend validates uniqueness)
       const response = await submitSpinLead({
         fullName: fullName.trim(),
         phoneNumber: phoneNumber.trim(),
@@ -272,11 +318,24 @@ export const SpinWheelModal = ({
       });
 
       if (!response.success) {
+        if (response.alreadySpun) {
+          setHasAlreadySpun(true);
+          setApiError("You have already spun the wheel!");
+          setIsSubmitting(false);
+          try {
+            localStorage.setItem("gog_user_spun", "true");
+            localStorage.setItem("gog_spun_email", email.trim().toLowerCase());
+            sessionStorage.setItem("gog_spin_completed", "true");
+          } catch {}
+          return;
+        }
         throw new Error(response.message || "Failed to record contact information");
       }
 
-      // Mark that user has spun in session
+      // Mark that user has spun in session and localStorage
       try {
+        localStorage.setItem("gog_user_spun", "true");
+        localStorage.setItem("gog_spun_email", email.trim().toLowerCase());
         sessionStorage.setItem("gog_spin_claimed", "true");
         sessionStorage.setItem("gog_spin_shown", "true");
       } catch {
@@ -315,23 +374,19 @@ export const SpinWheelModal = ({
       }, 4600);
     } catch (err) {
       console.error("Spin lead registration failed:", err);
-      setApiError(err.message || "Could not register your details. Please check your internet connection.");
+      if (err.alreadySpun || err.message?.includes("already spun")) {
+        setHasAlreadySpun(true);
+        setApiError("You have already spun the wheel!");
+        try {
+          localStorage.setItem("gog_user_spun", "true");
+          localStorage.setItem("gog_spun_email", email.trim().toLowerCase());
+          sessionStorage.setItem("gog_spin_completed", "true");
+        } catch {}
+      } else {
+        setApiError(err.message || "Could not register your details. Please check your internet connection.");
+      }
       setIsSubmitting(false);
     }
-  };
-
-  const handleClose = () => {
-    // Only allow closing if result has been revealed
-    if (step !== "result") {
-      return;
-    }
-    try {
-      sessionStorage.setItem("gog_spin_completed", "true");
-      sessionStorage.setItem("gog_spin_shown", "true");
-    } catch {
-      // Ignore
-    }
-    onClose();
   };
 
   if (!isOpen) return null;
@@ -340,7 +395,7 @@ export const SpinWheelModal = ({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md animate-fade-in overflow-y-auto"
       onClick={() => {
-        if (step === "result") {
+        if (step === "result" || hasAlreadySpun) {
           handleClose();
         }
       }}
@@ -353,8 +408,8 @@ export const SpinWheelModal = ({
         {/* Decorative Top Accent Bar */}
         <div className="h-2 w-full bg-gradient-to-r from-[#64263C] via-[#D6B477] to-[#64263C]" />
 
-        {/* Close Button - ONLY VISIBLE ONCE SPIN RESULT IS REVEALED */}
-        {step === "result" && (
+        {/* Close Button - VISIBLE ONCE SPIN RESULT IS REVEALED OR RETURNING USER HAS ALREADY SPUN */}
+        {(step === "result" || hasAlreadySpun) && (
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-white/90 hover:bg-pink-100 text-[#64263C] border border-pink-200 transition-all shadow-md"
@@ -429,13 +484,15 @@ export const SpinWheelModal = ({
                   <div className="mb-3">
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-100 text-[#64263C] text-[10px] font-bold uppercase tracking-wider mb-1.5">
                       <Sparkles className="w-3 h-3 text-[#D6B477]" />
-                      <span>Free Entry Spin Required</span>
+                      <span>{hasAlreadySpun ? "Spin Already Claimed" : "Free Entry Spin Required"}</span>
                     </div>
                     <h3 className="text-base font-serif font-bold text-[#64263C]">
-                      Where should we send your spin result?
+                      {hasAlreadySpun ? "Welcome Back to Games of Gloss" : "Where should we send your spin result?"}
                     </h3>
                     <p className="text-[11px] text-[#5A5255] mt-0.5">
-                      Please enter your contact information to spin the lucky wheel and reveal your result.
+                      {hasAlreadySpun
+                        ? "You have already spun the wheel and claimed your lucky draw reward."
+                        : "Please enter your contact information to spin the lucky wheel and reveal your result."}
                     </p>
                   </div>
 
@@ -513,6 +570,8 @@ export const SpinWheelModal = ({
                           value={email}
                           onChange={(e) => {
                             setEmail(e.target.value);
+                            setHasAlreadySpun(false);
+                            if (apiError) setApiError("");
                             if (errors.email) {
                               setErrors((prev) => ({ ...prev, email: null }));
                             }
@@ -557,24 +616,40 @@ export const SpinWheelModal = ({
                       <span>Your information is strictly protected & never shared.</span>
                     </div>
 
-                    {/* Submit & Spin Button */}
-                    <button
-                      type="submit"
-                      disabled={isSubmitting || isSpinning}
-                      className="w-full mt-2 py-3 px-5 rounded-full bg-[#64263C] hover:bg-[#4E1C2E] text-white text-xs font-bold tracking-wide shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting || isSpinning ? (
-                        <>
-                          <RotateCw className="w-4 h-4 animate-spin text-[#D6B477]" />
-                          <span>Spinning the Wheel...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="w-4 h-4 text-[#D6B477]" />
-                          <span>Submit & Spin Now!</span>
-                        </>
-                      )}
-                    </button>
+                    {/* Submit & Spin Button or Already Spun Notification */}
+                    {hasAlreadySpun ? (
+                      <div className="space-y-3 pt-1">
+                        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold text-center flex items-center justify-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                          <span>You have already spun the wheel!</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleClose}
+                          className="w-full py-3 px-5 rounded-full bg-[#64263C] hover:bg-[#4E1C2E] text-white text-xs font-bold tracking-wide shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                        >
+                          <span>Close & Continue Shopping</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || isSpinning}
+                        className="w-full mt-2 py-3 px-5 rounded-full bg-[#64263C] hover:bg-[#4E1C2E] text-white text-xs font-bold tracking-wide shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        {isSubmitting || isSpinning ? (
+                          <>
+                            <RotateCw className="w-4 h-4 animate-spin text-[#D6B477]" />
+                            <span>Spinning the Wheel...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4 text-[#D6B477]" />
+                            <span>Submit & Spin Now!</span>
+                          </>
+                        )}
+                      </button>
+                    )}
                   </form>
                 </div>
               )}

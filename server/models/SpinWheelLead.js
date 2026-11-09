@@ -9,12 +9,14 @@ const SpinWheelLeadSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: [true, "Phone number is required"],
+      required: false,
+      default: "",
       trim: true
     },
     email: {
       type: String,
       required: [true, "Email address is required"],
+      unique: true,
       trim: true,
       lowercase: true
     },

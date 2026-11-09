@@ -49,10 +49,13 @@ export function App() {
   const [quickViewJewellery, setQuickViewJewellery] = useState(null);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
-  // Spin Wheel Gate: Automatically shown to every visitor and cannot be closed until spin result comes
+  // Spin Wheel Gate: Automatically shown to first-time visitors; returning spun visitors are not blocked
   const [spinModalOpen, setSpinModalOpen] = useState(() => {
     try {
       if (typeof window !== "undefined" && window.location.hash === "#admin") {
+        return false;
+      }
+      if (localStorage.getItem("gog_user_spun") === "true") {
         return false;
       }
       return !sessionStorage.getItem("gog_spin_completed");
@@ -64,6 +67,7 @@ export function App() {
   useEffect(() => {
     try {
       if (window.location.hash === "#admin") return;
+      if (localStorage.getItem("gog_user_spun") === "true") return;
       const completed = sessionStorage.getItem("gog_spin_completed");
       if (!completed) {
         setSpinModalOpen(true);

@@ -27,6 +27,14 @@ export const FEATURED_COLLECTIONS = [
     filterTag: "Clean Girl Era 🤍"
   },
   {
+    id: "cat-eye",
+    title: "Cat Eye Collection 🔮",
+    tagline: "Magnetic Velvet & Shifting Aura",
+    description: "Multidimensional magnetic particles that shift with light, creating deep velvet halos and mesmerizing gem-like glows.",
+    image: "/images/velvetnoir_nail.jpg",
+    filterTag: "Cat Eye Collection 🔮"
+  },
+  {
     id: "baddie",
     title: "Baddie Energy 🖤",
     tagline: "Dramatic Shapes & Fierce Accents",

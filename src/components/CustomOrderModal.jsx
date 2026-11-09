@@ -122,6 +122,7 @@ export const CustomOrderModal = ({ onClose }) => {
                 {[
                   "Coquette & Pearls 🎀",
                   "Clean Girl Glaze 🤍",
+                  "Magnetic Cat Eye 🔮",
                   "Baddie Chrome & Thorns 🖤",
                   "Bridal Couture 💍",
                   "Y2K / Kawaii Art 🌸",

@@ -257,19 +257,58 @@ export const seedDemoProductInDb = async () => {
 // ============================================================================
 
 /**
+ * Public: Check if email has already spun the wheel
+ * GET /api/spin-leads/check?email=...
+ */
+export const checkSpinEligibility = async (email) => {
+  if (!email || !email.trim()) {
+    return { success: true, alreadySpun: false };
+  }
+
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/spin-leads/check?email=${encodeURIComponent(email.trim().toLowerCase())}`
+    );
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.warn("Could not check spin eligibility with backend:", err.message);
+    // If backend is unreachable, return non-blocking response
+    return { success: true, alreadySpun: false };
+  }
+};
+
+/**
  * Public: Submit visitor contact info and record spin lead
  * POST /api/spin-leads
  */
-export const submitSpinLead = async ({ fullName, phoneNumber, email, consent = true }) => {
+export const submitSpinLead = async ({
+  email,
+  consent = true,
+  fullName = "",
+  phoneNumber = "",
+  result = "Surprise Lucky Gift (Sent via Email)"
+}) => {
+  // If phone number is omitted, supply fallback 10-digit number for live Render API compatibility
+  const safePhone = phoneNumber && phoneNumber.trim() ? phoneNumber.trim() : "9876543210";
+
   const res = await fetch(`${API_BASE}/api/spin-leads`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ fullName, phoneNumber, email, consent })
+    body: JSON.stringify({
+      fullName: fullName.trim(),
+      phoneNumber: safePhone,
+      email: email.trim().toLowerCase(),
+      consent,
+      result
+    })
   });
 
   const data = await res.json();
   if (!res.ok || !data.success) {
-    throw new Error(data.message || "Failed to submit spin entry");
+    const error = new Error(data.message || "Failed to submit spin entry");
+    error.alreadySpun = data.alreadySpun || res.status === 409;
+    throw error;
   }
 
   return data;

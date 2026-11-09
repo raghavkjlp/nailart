@@ -26,6 +26,7 @@ export const ShopPage = ({
   // Available Filter Options
   const aesthetics = [
     "All",
+    "Cat Eye Collection",
     "Coquette Princess",
     "Clean Girl",
     "Baddie Energy",

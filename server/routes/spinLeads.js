@@ -9,25 +9,57 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_REGEX = /^[+]?[(]?[0-9]{1,4}[)]?[-\s./0-9]{7,15}$/;
 
 /**
+ * Public: Check if email has already spun the wheel
+ * GET /api/spin-leads/check?email=...
+ */
+router.get("/check", async (req, res) => {
+  try {
+    const email = String(req.query.email || "").trim().toLowerCase();
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required to check eligibility."
+      });
+    }
+
+    const existingLead = await SpinWheelLead.findOne({ email });
+    if (existingLead) {
+      return res.json({
+        success: true,
+        alreadySpun: true,
+        message: "You have already spun the wheel!",
+        result: existingLead.result,
+        leadId: existingLead._id
+      });
+    }
+
+    return res.json({
+      success: true,
+      alreadySpun: false,
+      message: "Eligible to spin the wheel."
+    });
+  } catch (error) {
+    console.error("Check spin eligibility error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to verify spin eligibility."
+    });
+  }
+});
+
+/**
  * Public: Submit visitor contact info and claim spin
  * POST /api/spin-leads
  */
 router.post("/", async (req, res) => {
   try {
-    const { fullName = "", phoneNumber = "", email = "", consent = true } = req.body;
+    const { fullName = "", phoneNumber = "", email = "", consent = true, result = "Surprise Lucky Gift (Sent via Email)" } = req.body;
 
-    const trimmedPhone = String(phoneNumber).trim();
-    const trimmedEmail = String(email).trim().toLowerCase();
-    const trimmedName = String(fullName).trim();
+    const trimmedPhone = String(phoneNumber || "").trim();
+    const trimmedEmail = String(email || "").trim().toLowerCase();
+    const trimmedName = String(fullName || "").trim();
 
-    // 1. Mandatory field checks
-    if (!trimmedPhone) {
-      return res.status(400).json({
-        success: false,
-        message: "Phone number is required."
-      });
-    }
-
+    // 1. Mandatory field checks (Email is primary identifier)
     if (!trimmedEmail) {
       return res.status(400).json({
         success: false,
@@ -43,36 +75,36 @@ router.post("/", async (req, res) => {
       });
     }
 
-    const digitsOnly = trimmedPhone.replace(/\D/g, "");
-    if (digitsOnly.length < 8 || digitsOnly.length > 15 || !PHONE_REGEX.test(trimmedPhone)) {
-      return res.status(400).json({
+    // If phone number is provided, validate it; otherwise it's optional
+    if (trimmedPhone) {
+      const digitsOnly = trimmedPhone.replace(/\D/g, "");
+      if (digitsOnly.length < 8 || digitsOnly.length > 15 || !PHONE_REGEX.test(trimmedPhone)) {
+        return res.status(400).json({
+          success: false,
+          message: "Please enter a valid phone number."
+        });
+      }
+    }
+
+    // 3. Strict returning visitor check against database (No duplicates allowed)
+    const existing = await SpinWheelLead.findOne({ email: trimmedEmail });
+    if (existing) {
+      return res.status(409).json({
         success: false,
-        message: "Please enter a valid phone number (at least 10 digits)."
+        alreadySpun: true,
+        message: "You have already spun the wheel!",
+        result: existing.result,
+        leadId: existing._id
       });
     }
 
-    // 3. Deduplication prevention (check if submitted in the last 60 seconds)
-    const recentDuplicate = await SpinWheelLead.findOne({
-      $or: [{ email: trimmedEmail }, { phoneNumber: trimmedPhone }],
-      createdAt: { $gte: new Date(Date.now() - 60 * 1000) }
-    });
-
-    if (recentDuplicate) {
-      return res.json({
-        success: true,
-        message: "Spin registered! Best of luck!",
-        result: "Better Luck Next Time!",
-        leadId: recentDuplicate._id
-      });
-    }
-
-    // 4. Save to MongoDB
+    // 4. Save unique email lead to MongoDB
     const lead = new SpinWheelLead({
       fullName: trimmedName,
       phoneNumber: trimmedPhone,
       email: trimmedEmail,
       source: "Spin the Wheel",
-      result: "Better Luck Next Time!",
+      result: result || "Surprise Lucky Gift (Sent via Email)",
       consent: Boolean(consent),
       ipAddress: req.ip || req.headers["x-forwarded-for"] || ""
     });
@@ -81,11 +113,19 @@ router.post("/", async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Spin registered successfully!",
-      result: "Better Luck Next Time!",
+      alreadySpun: false,
+      message: "Spin registered successfully! Reward sent to email.",
+      result: saved.result,
       leadId: saved._id
     });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        alreadySpun: true,
+        message: "You have already spun the wheel!"
+      });
+    }
     console.error("Spin lead save error:", error);
     return res.status(500).json({
       success: false,

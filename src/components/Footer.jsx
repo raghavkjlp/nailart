@@ -1,26 +1,15 @@
-import React, { useState } from "react";
-import { Sparkles, MessageCircle, Mail, MapPin, Heart, Send } from "lucide-react";
+import React from "react";
+import { Sparkles, MessageCircle, Mail } from "lucide-react";
 import { InstagramIcon } from "./InstagramIcon.jsx";
 import { BRAND_CONFIG } from "../config/brandConfig.js";
 import { createSupportUrl } from "../utils/whatsapp.js";
 
 export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrder }) => {
-  const [emailInput, setEmailInput] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (emailInput.trim()) {
-      setSubscribed(true);
-      setEmailInput("");
-    }
-  };
-
   return (
     <footer className="bg-[#242124] text-[#FFF9F5] pt-16 pb-12 border-t border-pink-900/40">
       <div className="container-custom">
         {/* Top Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-white/10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
           {/* Brand Info (2 cols) */}
           <div className="lg:col-span-2 space-y-3 pb-8 lg:pb-0 border-b border-white/10 lg:border-none">
             <div className="flex items-center gap-2">
@@ -196,42 +185,6 @@ export const Footer = ({ setActiveTab, onOpenQuiz, onOpenSizing, onOpenCustomOrd
                 </a>
               </li>
             </ul>
-          </div>
-
-          {/* Gloss VIP Club Newsletter */}
-          <div>
-            <h4 className="font-serif font-bold text-sm text-[#D6B477] uppercase tracking-wider mb-4">
-              The Gloss Club 💌
-            </h4>
-            <p className="text-xs text-gray-400 mb-3 leading-relaxed">
-              Subscribe for VIP secret drop alerts, seasonal nail art edits, and 10% off your first set.
-            </p>
-
-            {subscribed ? (
-              <div className="p-3 rounded-xl bg-pink-900/40 border border-pink-700/60 text-xs text-[#F3B6CB] font-semibold">
-                ✨ Welcome to the club, babe! Check your inbox soon.
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="space-y-2">
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    placeholder="Enter your email..."
-                    value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
-                    className="w-full py-2.5 px-3.5 rounded-full bg-white/10 border border-white/20 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-[#F3B6CB]"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-[#F3B6CB] text-[#64263C] flex items-center justify-center hover:bg-white transition-colors"
-                    aria-label="Subscribe"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </form>
-            )}
           </div>
         </div>
 

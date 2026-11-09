@@ -15,6 +15,7 @@ export const BestsellersSection = ({
 
   const tabs = [
     { id: "all", label: "All Bestsellers 🔥" },
+    { id: "cateye", label: "Cat Eye 🔮" },
     { id: "coquette", label: "Coquette 🎀" },
     { id: "clean", label: "Clean Girl 🤍" },
     { id: "chrome", label: "Chrome & Glazed ✨" },
@@ -30,6 +31,12 @@ export const BestsellersSection = ({
         p.badge?.includes("Bestseller") ||
         p.badge?.includes("Viral") ||
         activeProducts.length <= 6
+      );
+    }
+    if (activeTab === "cateye") {
+      return (
+        p.collection?.toLowerCase().includes("cat eye") ||
+        p.aestheticTags?.some((t) => t.toLowerCase().includes("cat eye"))
       );
     }
     if (activeTab === "coquette") return p.collection?.includes("Coquette");
